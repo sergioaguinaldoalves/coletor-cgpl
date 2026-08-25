@@ -1,42 +1,24 @@
-COLETOR PATRIMONIAL CGPL – PWA V2
+COLETOR PATRIMONIAL CGPL – PWA V2.1
 
-1. FINALIDADE
-Aplicativo web instalável para coleta patrimonial da CGPL/SECOM, com:
-- câmera do celular/iPad;
-- leitor Bluetooth;
-- importação de base CSV;
-- busca por patrimônio, número de série ou IMEI;
-- sessão por local/responsável;
-- identificação de divergências;
-- histórico local;
-- exportação CSV.
+ALTERAÇÕES DA V2.1
+- câmera otimizada para códigos de barras 1D;
+- prioridade para CODE 128, CODE 39, CODE 93, CODABAR e ITF;
+- área de leitura horizontal e mais estreita;
+- leitura a 20 FPS;
+- preferência por câmera traseira em 1920x1080;
+- foco contínuo quando suportado;
+- tentativa de zoom automático moderado;
+- botão de lanterna quando suportado;
+- indicação do formato detectado;
+- mantém Bluetooth, digitação manual, base CSV, sessão, histórico e exportação.
 
-2. IMPORTANTE PARA IPHONE/IPAD
-A câmera do Safari exige contexto seguro. Portanto, publique esta pasta em um endereço HTTPS.
-Abrir index.html diretamente pelo app Arquivos (file://) não é suficiente.
+PARA ATUALIZAR NO GITHUB
+1. Abra o repositório coletor-cgpl.
+2. Faça upload substituindo index.html, sw.js, manifest.json e os ícones.
+3. Confirme o commit.
+4. Aguarde o GitHub Pages publicar.
+5. No iPhone, feche completamente a PWA/Safari e abra novamente.
+6. Se ainda aparecer a versão antiga, remova o ícone da Tela de Início e abra novamente pelo Safari.
 
-3. FORMAS SIMPLES DE PUBLICAÇÃO
-- GitHub Pages;
-- Cloudflare Pages;
-- Netlify;
-- servidor web HTTPS interno da organização.
-
-4. INSTALAR NO IOS
-Após abrir o endereço HTTPS no Safari:
-Compartilhar > Adicionar à Tela de Início.
-
-5. BASE DE DADOS
-Use BASE_BENS_MODELO.csv como referência.
-O sistema aceita pequenas variações nos nomes das colunas e pesquisa por:
-- patrimônio;
-- número de série;
-- IMEI.
-
-6. OFFLINE
-Após a primeira abertura, os arquivos principais ficam em cache.
-A base e as coletas ficam salvas no armazenamento local do navegador.
-A biblioteca de leitura da câmera é carregada inicialmente pela internet.
-
-7. SEGURANÇA
-Os dados ficam no próprio dispositivo e não são enviados a servidor por este código.
-Para uso institucional definitivo, recomenda-se hospedar a biblioteca de leitura também internamente e definir política de backup/exportação.
+DICA PARA A ETIQUETA
+Mantenha a etiqueta horizontal, sem reflexo, e aproxime/afaste lentamente até as barras ocuparem quase toda a faixa de leitura.

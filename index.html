@@ -1,326 +1,142 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <meta name="theme-color" content="#17365D"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-  <meta name="apple-mobile-web-app-title" content="Coletor CGPL"/>
-  <link rel="manifest" href="manifest.json"/>
-  <link rel="apple-touch-icon" href="icon-192.png"/>
-  <title>Coletor Patrimonial CGPL</title>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <style>
-    :root{
-      --azul:#17365D; --azul2:#1F4E78; --claro:#EAF2F8; --amarelo:#FFF2CC;
-      --verde:#E2F0D9; --vermelho:#FCE4D6; --cinza:#F4F6F7; --texto:#1f2937;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f6;color:var(--texto)}
-    header{position:sticky;top:0;z-index:5;background:var(--azul);color:white;padding:14px 16px;box-shadow:0 2px 8px #0002}
-    header .sub{font-size:12px;opacity:.9;margin-top:2px}
-    main{max-width:980px;margin:auto;padding:12px}
-    .card{background:white;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 10px #0001}
-    .card h2,.card h3{margin:0 0 10px;color:var(--azul)}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-    label{display:block;font-size:12px;font-weight:700;margin-bottom:4px;color:#334155}
-    input,select,textarea{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:9px;font-size:16px;background:white}
-    textarea{min-height:76px;resize:vertical}
-    button{border:0;border-radius:10px;padding:12px 14px;font-weight:700;font-size:15px;background:var(--azul2);color:white;cursor:pointer}
-    button.secondary{background:#64748b} button.good{background:#2e7d32} button.warn{background:#b7791f} button.danger{background:#b91c1c}
-    .actions{display:flex;flex-wrap:wrap;gap:8px}
-    .status{padding:12px;border-radius:12px;font-weight:700;margin:10px 0}
-    .ok{background:var(--verde);color:#375623}.warning{background:var(--amarelo);color:#7f6000}.bad{background:var(--vermelho);color:#9c0006}.info{background:#ddebf7;color:#1f4e78}
-    #reader{width:100%;overflow:hidden;border-radius:12px}
-    .bigcode{font-size:28px;font-weight:800;text-align:center;padding:12px;background:#f8fafc;border:2px dashed #cbd5e1;border-radius:12px}
-    .muted{font-size:12px;color:#64748b}
-    table{width:100%;border-collapse:collapse;font-size:12px}
-    th,td{padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
-    th{position:sticky;top:0;background:#f8fafc;color:#334155}
-    .tablewrap{overflow:auto;max-height:360px;border:1px solid #e5e7eb;border-radius:10px}
-    .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
-    .kpi{background:#f8fafc;border-radius:10px;padding:10px;text-align:center}
-    .kpi b{display:block;font-size:24px;color:var(--azul)}
-    .hidden{display:none!important}
-    .pill{display:inline-block;padding:3px 8px;border-radius:999px;background:#e2e8f0;font-size:11px;font-weight:700}
-    @media(max-width:760px){.grid,.grid3,.kpis{grid-template-columns:1fr}.actions button{flex:1 1 45%}}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#17365D"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Coletor CGPL"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>Coletor Patrimonial CGPL</title>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<style>
+:root{--azul:#17365D;--azul2:#1F4E78;--verde:#E2F0D9;--amarelo:#FFF2CC;--vermelho:#FCE4D6}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f6;color:#1f2937}
+header{position:sticky;top:0;z-index:5;background:var(--azul);color:#fff;padding:14px 16px}
+main{max-width:980px;margin:auto;padding:12px}.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 10px #0001}
+h2,h3{margin:0 0 10px;color:var(--azul)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}input,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:9px;font-size:16px}
+textarea{min-height:70px}button{border:0;border-radius:10px;padding:12px 14px;font-weight:700;font-size:15px;background:var(--azul2);color:#fff}
+button.secondary{background:#64748b}button.good{background:#2e7d32}button.warn{background:#b7791f}button.danger{background:#b91c1c}
+.actions{display:flex;flex-wrap:wrap;gap:8px}.status{padding:12px;border-radius:12px;font-weight:700;margin:10px 0}
+.ok{background:var(--verde);color:#375623}.warning{background:var(--amarelo);color:#7f6000}.bad{background:var(--vermelho);color:#9c0006}.info{background:#ddebf7;color:#1f4e78}
+#reader{width:100%;overflow:hidden;border-radius:12px}.bigcode{font-size:28px;font-weight:800;text-align:center;padding:12px;background:#f8fafc;border:2px dashed #cbd5e1;border-radius:12px}
+.muted{font-size:12px;color:#64748b}.hidden{display:none!important}.tablewrap{overflow:auto;max-height:360px;border:1px solid #e5e7eb;border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;border-bottom:1px solid #e5e7eb;text-align:left}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.kpi{background:#f8fafc;border-radius:10px;padding:10px;text-align:center}.kpi b{display:block;font-size:24px;color:var(--azul)}
+@media(max-width:760px){.grid,.kpis{grid-template-columns:1fr}.actions button{flex:1 1 45%}}
+</style>
 </head>
 <body>
-<header>
-  <div><b>CGPL / SECOM</b> — Coletor Patrimonial</div>
-  <div class="sub">PWA para inventário e mapeamento físico</div>
-</header>
-
+<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.1 — leitura otimizada de etiquetas 1D</div></header>
 <main>
-  <section class="card">
-    <h2>1. Base patrimonial</h2>
-    <div class="actions">
-      <button id="btnImport">Importar BASE_BENS.csv</button>
-      <button class="secondary" id="btnExportBase">Exportar base carregada</button>
-      <input class="hidden" type="file" id="fileBase" accept=".csv,text/csv"/>
-    </div>
-    <p class="muted">Campos recomendados: Nº Patrimônio, Descrição do Bem, Tipo de Bem, Marca, Modelo, Nº Série, IMEI, UORG, Secretaria Cadastrada, Unidade Cadastrada, Edifício Cadastrado, Andar Cadastrado, Sala Cadastrada, Responsável Cadastrado.</p>
-    <div id="baseStatus" class="status info">Nenhuma base carregada.</div>
-  </section>
+<section class="card">
+<h2>1. Base patrimonial</h2>
+<div class="actions"><button id="btnImport">Importar BASE_BENS.csv</button><input class="hidden" type="file" id="fileBase" accept=".csv,text/csv"/></div>
+<div id="baseStatus" class="status info">Nenhuma base carregada.</div>
+</section>
 
-  <section class="card">
-    <h2>2. Nova sessão de coleta</h2>
-    <div class="grid">
-      <div><label>Secretaria</label><input id="sec" placeholder="Ex.: Secretaria-Executiva"/></div>
-      <div><label>UORG</label><input id="uorg" placeholder="Ex.: 23034"/></div>
-      <div><label>Unidade</label><input id="uni" placeholder="Ex.: CGPL"/></div>
-      <div><label>Edifício</label><input id="edi" placeholder="Ex.: Palácio do Planalto"/></div>
-      <div><label>Andar</label><input id="andar" placeholder="Ex.: Subsolo"/></div>
-      <div><label>Sala</label><input id="sala" placeholder="Ex.: 02"/></div>
-      <div><label>Responsável/Detentor</label><input id="resp"/></div>
-      <div><label>Agente da coleta</label><input id="agente"/></div>
-    </div>
-    <label style="margin-top:10px">Observação da sessão</label>
-    <textarea id="obsSessao"></textarea>
-    <div class="actions" style="margin-top:10px">
-      <button class="good" id="btnIniciarSessao">Iniciar / Atualizar sessão</button>
-      <button class="warn" id="btnFecharSala">Fechar sala</button>
-    </div>
-    <div id="sessaoStatus" class="status info">Sessão ainda não iniciada.</div>
-  </section>
+<section class="card">
+<h2>2. Sessão de coleta</h2>
+<div class="grid">
+<div><label>Secretaria</label><input id="sec"></div><div><label>UORG</label><input id="uorg"></div>
+<div><label>Unidade</label><input id="uni"></div><div><label>Edifício</label><input id="edi"></div>
+<div><label>Andar</label><input id="andar"></div><div><label>Sala</label><input id="sala"></div>
+<div><label>Responsável/Detentor</label><input id="resp"></div><div><label>Agente da coleta</label><input id="agente"></div>
+</div>
+<label style="margin-top:10px">Observação</label><textarea id="obsSessao"></textarea>
+<div class="actions" style="margin-top:10px"><button class="good" id="btnIniciarSessao">Iniciar / Atualizar sessão</button></div>
+<div id="sessaoStatus" class="status info">Sessão ainda não iniciada.</div>
+</section>
 
-  <section class="card">
-    <h2>3. Coleta</h2>
-    <div class="grid">
-      <div>
-        <h3>Câmera</h3>
-        <div id="reader"></div>
-        <div class="actions" style="margin-top:8px">
-          <button class="good" id="btnCamera">Iniciar câmera</button>
-          <button class="secondary" id="btnPararCamera">Parar câmera</button>
-        </div>
-      </div>
-      <div>
-        <h3>Bluetooth / Digitação</h3>
-        <p class="muted">Leitores Bluetooth normalmente funcionam como teclado. Mantenha o cursor no campo abaixo e configure o leitor para enviar ENTER.</p>
-        <label>Patrimônio / Série / IMEI</label>
-        <input id="entradaManual" autocomplete="off" inputmode="text" placeholder="Leia ou digite aqui"/>
-        <div class="actions" style="margin-top:8px">
-          <button id="btnAdicionar">Registrar leitura</button>
-          <button class="secondary" id="btnSemEtiqueta">Bem sem etiqueta</button>
-        </div>
-      </div>
-    </div>
-    <div style="margin-top:12px" class="bigcode" id="ultimoCodigo">Aguardando leitura</div>
-    <div id="resultadoLeitura" class="status info">Nenhuma leitura realizada nesta sessão.</div>
-    <div id="detalhesBem"></div>
-  </section>
+<section class="card">
+<h2>3. Coleta</h2>
+<div class="grid">
+<div>
+<h3>Câmera</h3>
+<div id="reader"></div>
+<div class="actions" style="margin-top:8px">
+<button class="good" id="btnCamera">Iniciar câmera</button>
+<button class="secondary" id="btnPararCamera">Parar câmera</button>
+<button class="warn" id="btnLanterna">Lanterna</button>
+</div>
+<div class="status info" id="cameraHint">Aponte a etiqueta na horizontal e aproxime até as barras ocuparem quase toda a faixa.</div>
+</div>
+<div>
+<h3>Bluetooth / Digitação</h3>
+<p class="muted">O leitor Bluetooth funciona como teclado. Deixe o cursor no campo abaixo e use ENTER após a leitura.</p>
+<label>Patrimônio / Série / IMEI</label><input id="entradaManual" autocomplete="off">
+<div class="actions" style="margin-top:8px"><button id="btnAdicionar">Registrar leitura</button><button class="secondary" id="btnSemEtiqueta">Bem sem etiqueta</button></div>
+</div>
+</div>
+<div style="margin-top:12px" class="bigcode" id="ultimoCodigo">Aguardando leitura</div>
+<div id="formatoDetectado" class="muted" style="text-align:center;margin-top:4px">Formato: aguardando leitura</div>
+<div id="resultadoLeitura" class="status info">Nenhuma leitura realizada nesta sessão.</div>
+<div id="detalhesBem"></div>
+</section>
 
-  <section class="card">
-    <h2>4. Resumo da sala</h2>
-    <div class="kpis">
-      <div class="kpi"><b id="kTotal">0</b>Total</div>
-      <div class="kpi"><b id="kConforme">0</b>Conformes</div>
-      <div class="kpi"><b id="kDiv">0</b>Divergências</div>
-      <div class="kpi"><b id="kFora">0</b>Fora da base</div>
-      <div class="kpi"><b id="kDup">0</b>Duplicados</div>
-    </div>
-  </section>
+<section class="card">
+<h2>4. Resumo</h2>
+<div class="kpis">
+<div class="kpi"><b id="kTotal">0</b>Total</div><div class="kpi"><b id="kConforme">0</b>Conformes</div>
+<div class="kpi"><b id="kDiv">0</b>Divergências</div><div class="kpi"><b id="kFora">0</b>Fora da base</div><div class="kpi"><b id="kDup">0</b>Duplicados</div>
+</div>
+</section>
 
-  <section class="card">
-    <h2>5. Histórico da coleta</h2>
-    <div class="actions">
-      <button id="btnExportar">Exportar coleta CSV</button>
-      <button class="secondary" id="btnExportarResumo">Exportar resumo</button>
-      <button class="danger" id="btnLimpar">Limpar coletas</button>
-    </div>
-    <div class="tablewrap" style="margin-top:10px">
-      <table>
-        <thead><tr><th>Data/Hora</th><th>Código</th><th>Descrição</th><th>Sala</th><th>Responsável</th><th>Resultado</th></tr></thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-  </section>
+<section class="card">
+<h2>5. Histórico</h2>
+<div class="actions"><button id="btnExportar">Exportar coleta CSV</button><button class="danger" id="btnLimpar">Limpar coletas</button></div>
+<div class="tablewrap" style="margin-top:10px"><table><thead><tr><th>Data/Hora</th><th>Código</th><th>Descrição</th><th>Sala</th><th>Resultado</th></tr></thead><tbody id="tbody"></tbody></table></div>
+</section>
 </main>
 
 <script>
 const $=id=>document.getElementById(id);
-let base=[], indexPat=new Map(), indexSerie=new Map(), indexImei=new Map();
-let coletas=[], sessao={}, scanner=null, ultimoScan="", ultimoScanEm=0;
-
+let base=[],indexPat=new Map(),indexSerie=new Map(),indexImei=new Map(),coletas=[],sessao={},scanner=null,ultimoScan="",ultimoScanEm=0,lanternaLigada=false;
 function norm(v){return String(v??"").trim()}
 function cleanHeader(h){return norm(h).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"")}
-function getAny(o, aliases){
-  for(const a of aliases){
-    const key=Object.keys(o).find(k=>cleanHeader(k)===cleanHeader(a));
-    if(key!==undefined && norm(o[key])!=="") return norm(o[key]);
-  }
-  return "";
-}
-function csvParse(text){
-  const first=text.split(/\r?\n/)[0]||"";
-  const delim=(first.match(/;/g)||[]).length >= (first.match(/,/g)||[]).length ? ";" : ",";
-  const rows=[]; let row=[], cell="", q=false;
-  for(let i=0;i<text.length;i++){
-    const c=text[i];
-    if(c==='"'){ if(q && text[i+1]==='"'){cell+='"';i++;} else q=!q; }
-    else if(c===delim && !q){row.push(cell);cell="";}
-    else if((c==='\n'||c==='\r')&&!q){
-      if(c==='\r'&&text[i+1]==='\n')i++;
-      row.push(cell); if(row.some(x=>x!==""))rows.push(row); row=[];cell="";
-    } else cell+=c;
-  }
-  if(cell||row.length){row.push(cell);rows.push(row)}
-  if(rows.length<2)return [];
-  const head=rows[0].map(x=>x.replace(/^\ufeff/,"").trim());
-  return rows.slice(1).map(r=>Object.fromEntries(head.map((h,i)=>[h, r[i]??""])));
-}
-function csvCell(v){return `"${String(v??"").replaceAll('"','""')}"`}
-function saveText(name,text,type="text/csv;charset=utf-8"){
-  const blob=new Blob(["\ufeff"+text],{type}),a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href)
-}
-function rebuildIndex(){
-  indexPat=new Map(); indexSerie=new Map(); indexImei=new Map();
-  base.forEach(b=>{
-    const p=getAny(b,["Nº Patrimônio","Numero Patrimonio","Patrimônio","Patrimonio"]);
-    const s=getAny(b,["Nº Série","Numero Serie","Série","Serie"]);
-    const i=getAny(b,["IMEI"]);
-    if(p)indexPat.set(p,b); if(s)indexSerie.set(s,b); if(i)indexImei.set(i,b);
-  });
-  localStorage.setItem("cgpl_base",JSON.stringify(base));
-  $("baseStatus").className="status ok";
-  $("baseStatus").textContent=`Base carregada: ${base.length} bens.`;
-}
-function loadLocal(){
-  try{base=JSON.parse(localStorage.getItem("cgpl_base")||"[]");}catch(e){base=[]}
-  try{coletas=JSON.parse(localStorage.getItem("cgpl_coletas")||"[]");}catch(e){coletas=[]}
-  try{sessao=JSON.parse(localStorage.getItem("cgpl_sessao")||"{}");}catch(e){sessao={}}
-  if(base.length)rebuildIndex();
-  for(const [id,key] of [["sec","secretaria"],["uorg","uorg"],["uni","unidade"],["edi","edificio"],["andar","andar"],["sala","sala"],["resp","responsavel"],["agente","agente"],["obsSessao","obs"]]){
-    if(sessao[key])$(id).value=sessao[key];
-  }
-  render();
-}
+function getAny(o,a){for(const x of a){const k=Object.keys(o).find(y=>cleanHeader(y)===cleanHeader(x));if(k!==undefined&&norm(o[k])!=="")return norm(o[k])}return""}
+function csvParse(t){const first=t.split(/\r?\n/)[0]||"";const d=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length?";":",";const rows=[];let row=[],cell="",q=false;for(let i=0;i<t.length;i++){const c=t[i];if(c==='"'){if(q&&t[i+1]==='"'){cell+='"';i++}else q=!q}else if(c===d&&!q){row.push(cell);cell=""}else if((c==="\n"||c==="\r")&&!q){if(c==="\r"&&t[i+1]==="\n")i++;row.push(cell);if(row.some(x=>x!==""))rows.push(row);row=[];cell=""}else cell+=c}if(cell||row.length){row.push(cell);rows.push(row)}if(rows.length<2)return[];const h=rows[0].map(x=>x.replace(/^\ufeff/,"").trim());return rows.slice(1).map(r=>Object.fromEntries(h.map((x,i)=>[x,r[i]??""])))}
+function rebuild(){indexPat=new Map();indexSerie=new Map();indexImei=new Map();base.forEach(b=>{const p=getAny(b,["Nº Patrimônio","Numero Patrimonio","Patrimônio","Patrimonio"]);const s=getAny(b,["Nº Série","Numero Serie","Série","Serie"]);const i=getAny(b,["IMEI"]);if(p)indexPat.set(p,b);if(s)indexSerie.set(s,b);if(i)indexImei.set(i,b)});localStorage.setItem("cgpl_base",JSON.stringify(base));$("baseStatus").className="status ok";$("baseStatus").textContent=`Base carregada: ${base.length} bens.`}
+function render(){const scope=coletas.filter(x=>!sessao.sala||x.sala===sessao.sala);$("kTotal").textContent=scope.length;$("kConforme").textContent=scope.filter(x=>x.resultado==="CONFORME").length;$("kDiv").textContent=scope.filter(x=>x.resultado.startsWith("DIVERGÊNCIA")).length;$("kFora").textContent=scope.filter(x=>x.resultado==="NÃO CONSTA NA BASE").length;$("kDup").textContent=scope.filter(x=>x.resultado==="JÁ COLETADO").length;$("tbody").innerHTML=coletas.slice().reverse().map(x=>`<tr><td>${x.dataHora}</td><td>${x.codigo}</td><td>${x.descricao||"-"}</td><td>${x.sala||"-"}</td><td>${x.resultado}</td></tr>`).join("")}
+function load(){try{base=JSON.parse(localStorage.getItem("cgpl_base")||"[]");coletas=JSON.parse(localStorage.getItem("cgpl_coletas")||"[]");sessao=JSON.parse(localStorage.getItem("cgpl_sessao")||"{}")}catch(e){}if(base.length)rebuild();render()}
 $("btnImport").onclick=()=>$("fileBase").click();
-$("fileBase").onchange=async e=>{
-  const f=e.target.files[0]; if(!f)return;
-  const text=await f.text(); base=csvParse(text); rebuildIndex(); render();
-};
-$("btnExportBase").onclick=()=>{
-  if(!base.length)return alert("Nenhuma base carregada.");
-  const heads=Object.keys(base[0]); const lines=[heads.map(csvCell).join(";"),...base.map(o=>heads.map(h=>csvCell(o[h])).join(";"))];
-  saveText("CGPL_BASE_BENS_exportada.csv",lines.join("\r\n"));
-};
-$("btnIniciarSessao").onclick=()=>{
-  sessao={secretaria:norm($("sec").value),uorg:norm($("uorg").value),unidade:norm($("uni").value),edificio:norm($("edi").value),andar:norm($("andar").value),sala:norm($("sala").value),responsavel:norm($("resp").value),agente:norm($("agente").value),obs:norm($("obsSessao").value),iniciadaEm:new Date().toISOString()};
-  localStorage.setItem("cgpl_sessao",JSON.stringify(sessao));
-  $("sessaoStatus").className="status ok";
-  $("sessaoStatus").textContent=`Sessão ativa: ${sessao.edificio || "-"} / ${sessao.andar || "-"} / Sala ${sessao.sala || "-"}`;
-  $("entradaManual").focus();
-};
-function findBem(code){
-  return indexPat.get(code)||indexSerie.get(code)||indexImei.get(code)||null;
-}
-function classify(bem,code){
-  if(coletas.some(x=>x.codigo===code))return "JÁ COLETADO";
-  if(!bem)return "NÃO CONSTA NA BASE";
-  const eCad=getAny(bem,["Edifício Cadastrado","Edificio Cadastrado","Edifício","Edificio"]);
-  const aCad=getAny(bem,["Andar Cadastrado","Andar"]);
-  const sCad=getAny(bem,["Sala Cadastrada","Sala"]);
-  const rCad=getAny(bem,["Responsável Cadastrado","Responsavel Cadastrado","Responsável","Responsavel"]);
-  if((eCad&&sessao.edificio&&eCad!==sessao.edificio)||(aCad&&sessao.andar&&aCad!==sessao.andar)||(sCad&&sessao.sala&&sCad!==sessao.sala))return "DIVERGÊNCIA DE LOCALIZAÇÃO";
-  if(rCad&&sessao.responsavel&&rCad!==sessao.responsavel)return "DIVERGÊNCIA DE RESPONSÁVEL";
-  return "CONFORME";
-}
-function register(code, semEtiqueta=false){
-  code=norm(code); if(!code && !semEtiqueta)return;
-  if(!sessao.iniciadaEm)return alert("Inicie uma sessão de coleta antes.");
-  const bem=code?findBem(code):null;
-  const resultado=semEtiqueta?"SEM ETIQUETA / ILEGÍVEL":classify(bem,code);
-  const rec={
-    dataHora:new Date().toLocaleString("pt-BR"), codigo:code||"SEM ETIQUETA",
-    patrimonio:bem?getAny(bem,["Nº Patrimônio","Numero Patrimonio","Patrimônio","Patrimonio"]):"",
-    descricao:bem?getAny(bem,["Descrição do Bem","Descricao do Bem","Descrição","Descricao"]):"",
-    tipo:bem?getAny(bem,["Tipo de Bem","Tipo"]):"",
-    marca:bem?getAny(bem,["Marca"]):"", modelo:bem?getAny(bem,["Modelo"]):"",
-    serie:bem?getAny(bem,["Nº Série","Numero Serie","Série","Serie"]):"",
-    imei:bem?getAny(bem,["IMEI"]):"",
-    secretaria:sessao.secretaria,uorg:sessao.uorg,unidade:sessao.unidade,edificio:sessao.edificio,andar:sessao.andar,sala:sessao.sala,
-    responsavel:sessao.responsavel,agente:sessao.agente,obsSessao:sessao.obs,
-    resultado
-  };
-  coletas.push(rec); localStorage.setItem("cgpl_coletas",JSON.stringify(coletas));
-  $("ultimoCodigo").textContent=rec.codigo;
-  const cls=resultado==="CONFORME"?"ok":resultado==="NÃO CONSTA NA BASE"?"bad":"warning";
-  $("resultadoLeitura").className="status "+cls;
-  $("resultadoLeitura").textContent=resultado;
-  $("detalhesBem").innerHTML=bem?`
-    <div class="card" style="background:#f8fafc">
-      <b>${rec.patrimonio||rec.codigo}</b> — ${rec.descricao||"Sem descrição"}<br>
-      <span class="pill">${rec.tipo||"Tipo não informado"}</span>
-      <p><b>Série:</b> ${rec.serie||"-"} &nbsp; <b>IMEI:</b> ${rec.imei||"-"}</p>
-      <p><b>Cadastro:</b> ${getAny(bem,["Edifício Cadastrado","Edificio Cadastrado"])} / ${getAny(bem,["Andar Cadastrado"])} / Sala ${getAny(bem,["Sala Cadastrada"])}<br>
-      <b>Responsável cadastrado:</b> ${getAny(bem,["Responsável Cadastrado","Responsavel Cadastrado"])||"-"}</p>
-      <p><b>Encontrado:</b> ${sessao.edificio} / ${sessao.andar} / Sala ${sessao.sala}<br><b>Responsável encontrado:</b> ${sessao.responsavel||"-"}</p>
-    </div>`:"";
-  if(navigator.vibrate)navigator.vibrate(resultado==="CONFORME"?80:[100,80,100]);
-  render();
-}
+$("fileBase").onchange=async e=>{const f=e.target.files[0];if(!f)return;base=csvParse(await f.text());rebuild();render()};
+$("btnIniciarSessao").onclick=()=>{sessao={secretaria:norm($("sec").value),uorg:norm($("uorg").value),unidade:norm($("uni").value),edificio:norm($("edi").value),andar:norm($("andar").value),sala:norm($("sala").value),responsavel:norm($("resp").value),agente:norm($("agente").value),obs:norm($("obsSessao").value),iniciadaEm:new Date().toISOString()};localStorage.setItem("cgpl_sessao",JSON.stringify(sessao));$("sessaoStatus").className="status ok";$("sessaoStatus").textContent=`Sessão ativa: ${sessao.edificio||"-"} / ${sessao.andar||"-"} / Sala ${sessao.sala||"-"}`;$("entradaManual").focus()};
+function findBem(c){return indexPat.get(c)||indexSerie.get(c)||indexImei.get(c)||null}
+function classify(b,c){if(coletas.some(x=>x.codigo===c))return"JÁ COLETADO";if(!b)return"NÃO CONSTA NA BASE";const ec=getAny(b,["Edifício Cadastrado","Edificio Cadastrado"]),ac=getAny(b,["Andar Cadastrado"]),sc=getAny(b,["Sala Cadastrada"]),rc=getAny(b,["Responsável Cadastrado","Responsavel Cadastrado"]);if((ec&&sessao.edificio&&ec!==sessao.edificio)||(ac&&sessao.andar&&ac!==sessao.andar)||(sc&&sessao.sala&&sc!==sessao.sala))return"DIVERGÊNCIA DE LOCALIZAÇÃO";if(rc&&sessao.responsavel&&rc!==sessao.responsavel)return"DIVERGÊNCIA DE RESPONSÁVEL";return"CONFORME"}
+function register(code,semEtiqueta=false){code=norm(code);if(!code&&!semEtiqueta)return;if(!sessao.iniciadaEm)return alert("Inicie uma sessão primeiro.");const b=code?findBem(code):null;const r=semEtiqueta?"SEM ETIQUETA / ILEGÍVEL":classify(b,code);const rec={dataHora:new Date().toLocaleString("pt-BR"),codigo:code||"SEM ETIQUETA",patrimonio:b?getAny(b,["Nº Patrimônio","Patrimônio","Patrimonio"]):"",descricao:b?getAny(b,["Descrição do Bem","Descricao do Bem","Descrição","Descricao"]):"",tipo:b?getAny(b,["Tipo de Bem","Tipo"]):"",serie:b?getAny(b,["Nº Série","Série","Serie"]):"",imei:b?getAny(b,["IMEI"]):"",secretaria:sessao.secretaria,uorg:sessao.uorg,unidade:sessao.unidade,edificio:sessao.edificio,andar:sessao.andar,sala:sessao.sala,responsavel:sessao.responsavel,agente:sessao.agente,resultado:r};coletas.push(rec);localStorage.setItem("cgpl_coletas",JSON.stringify(coletas));$("ultimoCodigo").textContent=rec.codigo;$("resultadoLeitura").className="status "+(r==="CONFORME"?"ok":r==="NÃO CONSTA NA BASE"?"bad":"warning");$("resultadoLeitura").textContent=r;$("detalhesBem").innerHTML=b?`<div class="card" style="background:#f8fafc"><b>${rec.patrimonio||rec.codigo}</b> — ${rec.descricao||"Sem descrição"}<br><b>Série:</b> ${rec.serie||"-"} &nbsp; <b>IMEI:</b> ${rec.imei||"-"}</div>`:"";if(navigator.vibrate)navigator.vibrate(r==="CONFORME"?80:[100,80,100]);render()}
 $("btnAdicionar").onclick=()=>{register($("entradaManual").value);$("entradaManual").value="";$("entradaManual").focus()};
 $("entradaManual").addEventListener("keydown",e=>{if(e.key==="Enter")$("btnAdicionar").click()});
 $("btnSemEtiqueta").onclick=()=>register("",true);
 
 $("btnCamera").onclick=async()=>{
-  if(scanner)return;
-  if(!window.isSecureContext)return alert("A câmera exige HTTPS no iPhone/iPad. Publique esta PWA em um endereço HTTPS.");
-  scanner=new Html5Qrcode("reader");
-  try{
-    const cameras=await Html5Qrcode.getCameras();
-    if(!cameras.length)throw new Error("Nenhuma câmera");
-    const back=cameras.find(c=>/back|rear|traseira|environment/i.test(c.label))||cameras[cameras.length-1];
-    await scanner.start(back.id,{fps:12,qrbox:{width:300,height:160},aspectRatio:1.777},decoded=>{
-      const now=Date.now(); if(decoded===ultimoScan&&now-ultimoScanEm<1800)return;
-      ultimoScan=decoded;ultimoScanEm=now;register(decoded)
-    });
-  }catch(e){scanner=null;alert("Não foi possível abrir a câmera. Verifique a permissão do Safari para este site.")}
+ if(scanner)return;
+ if(!window.isSecureContext)return alert("A câmera exige HTTPS no iPhone/iPad.");
+ let formats=[];
+ try{formats=[Html5QrcodeSupportedFormats.CODE_128,Html5QrcodeSupportedFormats.CODE_39,Html5QrcodeSupportedFormats.CODE_93,Html5QrcodeSupportedFormats.CODABAR,Html5QrcodeSupportedFormats.ITF]}catch(e){}
+ scanner=formats.length?new Html5Qrcode("reader",{formatsToSupport:formats,experimentalFeatures:{useBarCodeDetectorIfSupported:true}}):new Html5Qrcode("reader");
+ try{
+  const cams=await Html5Qrcode.getCameras(); if(!cams.length)throw new Error("Sem câmera");
+  const back=cams.find(c=>/back|rear|traseira|environment/i.test(c.label))||cams[cams.length-1];
+  const qrbox=(vw,vh)=>({width:Math.floor(Math.min(vw*.94,520)),height:Math.floor(Math.max(90,Math.min(vh*.28,170)))});
+  await scanner.start(back.id,{fps:20,qrbox,aspectRatio:1.777778,disableFlip:true,videoConstraints:{facingMode:"environment",width:{ideal:1920},height:{ideal:1080},focusMode:"continuous"}},(decoded,res)=>{
+    const now=Date.now(); if(decoded===ultimoScan&&now-ultimoScanEm<1800)return; ultimoScan=decoded;ultimoScanEm=now;
+    try{$("formatoDetectado").textContent="Formato detectado: "+(res?.result?.format?.formatName||"1D")}catch(e){}
+    register(decoded)
+  },()=>{});
+  $("cameraHint").className="status ok";$("cameraHint").textContent="Câmera ativa. Mantenha a etiqueta horizontal, bem iluminada e sem reflexo.";
+  try{const caps=scanner.getRunningTrackCapabilities?.();if(caps?.zoom){const target=Math.min(2.0,caps.zoom.max||2.0);await scanner.applyVideoConstraints({advanced:[{zoom:target}]})}}catch(e){}
+ }catch(e){try{await scanner.clear()}catch(_){ }scanner=null;$("cameraHint").className="status bad";$("cameraHint").textContent="Não foi possível abrir a câmera. Verifique a permissão do Safari.";alert("Não foi possível abrir a câmera.")}
 };
-$("btnPararCamera").onclick=async()=>{if(scanner){try{await scanner.stop();await scanner.clear()}catch(e){}scanner=null}};
+$("btnPararCamera").onclick=async()=>{if(scanner){try{await scanner.stop();await scanner.clear()}catch(e){}scanner=null;lanternaLigada=false;$("cameraHint").className="status info";$("cameraHint").textContent="Câmera parada."}};
+$("btnLanterna").onclick=async()=>{if(!scanner)return alert("Inicie a câmera primeiro.");try{const caps=scanner.getRunningTrackCapabilities?.();if(!caps?.torch)return alert("Lanterna não disponível neste aparelho/navegador.");lanternaLigada=!lanternaLigada;await scanner.applyVideoConstraints({advanced:[{torch:lanternaLigada}]});$("btnLanterna").textContent=lanternaLigada?"Apagar lanterna":"Lanterna"}catch(e){alert("Não foi possível controlar a lanterna.")}};
 
-function render(){
-  const scope=coletas.filter(x=>!sessao.sala || x.sala===sessao.sala);
-  $("kTotal").textContent=scope.length;
-  $("kConforme").textContent=scope.filter(x=>x.resultado==="CONFORME").length;
-  $("kDiv").textContent=scope.filter(x=>x.resultado.startsWith("DIVERGÊNCIA")).length;
-  $("kFora").textContent=scope.filter(x=>x.resultado==="NÃO CONSTA NA BASE").length;
-  $("kDup").textContent=scope.filter(x=>x.resultado==="JÁ COLETADO").length;
-  $("tbody").innerHTML=coletas.slice().reverse().map(x=>`<tr><td>${x.dataHora}</td><td>${x.codigo}</td><td>${x.descricao||"-"}</td><td>${x.sala||"-"}</td><td>${x.responsavel||"-"}</td><td>${x.resultado}</td></tr>`).join("");
-}
-$("btnFecharSala").onclick=()=>{
-  const scope=coletas.filter(x=>x.sala===sessao.sala && x.edificio===sessao.edificio);
-  const resumo={
-    sala:sessao.sala, edificio:sessao.edificio,total:scope.length,
-    conformes:scope.filter(x=>x.resultado==="CONFORME").length,
-    divergencias:scope.filter(x=>x.resultado.startsWith("DIVERGÊNCIA")).length,
-    foraBase:scope.filter(x=>x.resultado==="NÃO CONSTA NA BASE").length,
-    duplicados:scope.filter(x=>x.resultado==="JÁ COLETADO").length
-  };
-  alert(`Sala ${resumo.sala||"-"} encerrada.\nTotal: ${resumo.total}\nConformes: ${resumo.conformes}\nDivergências: ${resumo.divergencias}\nFora da base: ${resumo.foraBase}\nDuplicados: ${resumo.duplicados}`);
-};
-$("btnExportar").onclick=()=>{
-  if(!coletas.length)return alert("Nenhuma coleta.");
-  const h=["Data/Hora","Código Lido","Patrimônio","Descrição","Tipo","Marca","Modelo","Nº Série","IMEI","Secretaria","UORG","Unidade","Edifício","Andar","Sala","Responsável Encontrado","Agente da Coleta","Observação da Sessão","Resultado"];
-  const lines=[h.map(csvCell).join(";"),...coletas.map(x=>[x.dataHora,x.codigo,x.patrimonio,x.descricao,x.tipo,x.marca,x.modelo,x.serie,x.imei,x.secretaria,x.uorg,x.unidade,x.edificio,x.andar,x.sala,x.responsavel,x.agente,x.obsSessao,x.resultado].map(csvCell).join(";"))];
-  saveText("CGPL_coleta_patrimonial.csv",lines.join("\r\n"));
-};
-$("btnExportarResumo").onclick=()=>{
-  const by={}; coletas.forEach(x=>{const k=[x.secretaria,x.edificio,x.andar,x.sala].join(" | ");by[k]??={local:k,total:0,conformes:0,divergencias:0,foraBase:0,duplicados:0};const r=by[k];r.total++;if(x.resultado==="CONFORME")r.conformes++;else if(x.resultado.startsWith("DIVERGÊNCIA"))r.divergencias++;else if(x.resultado==="NÃO CONSTA NA BASE")r.foraBase++;else if(x.resultado==="JÁ COLETADO")r.duplicados++;});
-  const h=["Local","Total","Conformes","Divergências","Não constam na base","Duplicados"];
-  const lines=[h.map(csvCell).join(";"),...Object.values(by).map(r=>[r.local,r.total,r.conformes,r.divergencias,r.foraBase,r.duplicados].map(csvCell).join(";"))];
-  saveText("CGPL_resumo_por_local.csv",lines.join("\r\n"));
-};
-$("btnLimpar").onclick=()=>{if(confirm("Excluir todas as coletas gravadas neste dispositivo?")){coletas=[];localStorage.removeItem("cgpl_coletas");render()}};
-
-if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{})}
-loadLocal();
+function csvCell(v){return `"${String(v??"").replaceAll('"','""')}"`}
+$("btnExportar").onclick=()=>{if(!coletas.length)return alert("Nenhuma coleta.");const h=["Data/Hora","Código Lido","Patrimônio","Descrição","Tipo","Nº Série","IMEI","Secretaria","UORG","Unidade","Edifício","Andar","Sala","Responsável","Agente","Resultado"];const lines=[h.map(csvCell).join(";"),...coletas.map(x=>[x.dataHora,x.codigo,x.patrimonio,x.descricao,x.tipo,x.serie,x.imei,x.secretaria,x.uorg,x.unidade,x.edificio,x.andar,x.sala,x.responsavel,x.agente,x.resultado].map(csvCell).join(";"))];const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CGPL_coleta_patrimonial.csv";a.click();URL.revokeObjectURL(a.href)};
+$("btnLimpar").onclick=()=>{if(confirm("Excluir todas as coletas deste dispositivo?")){coletas=[];localStorage.removeItem("cgpl_coletas");render()}};
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+load();
 </script>
-</body>
-</html>
+</body></html>
