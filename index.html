@@ -29,11 +29,11 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 </style>
 </head>
 <body>
-<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.2 — alerta sonoro e bloqueio de duplicidade</div></header>
+<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.3 — importação direta do GPAT</div></header>
 <main>
 <section class="card">
 <h2>1. Base patrimonial</h2>
-<div class="actions"><button id="btnImport">Importar BASE_BENS.csv</button><input class="hidden" type="file" id="fileBase" accept=".csv,text/csv"/></div>
+<div class="actions"><button id="btnImport">Importar GPAT (.xls) ou CSV</button><input class="hidden" type="file" id="fileBase" accept=".xls,.html,.htm,.csv,text/csv,text/html,application/vnd.ms-excel"/></div>
 <div id="baseStatus" class="status info">Nenhuma base carregada.</div>
 </section>
 
@@ -93,7 +93,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 
 <script>
 const $=id=>document.getElementById(id);
-let base=[],indexPat=new Map(),indexSerie=new Map(),indexImei=new Map(),coletas=[],sessao={},scanner=null,ultimoScan="",ultimoScanEm=0,lanternaLigada=false;
+let base=[],indexPat=new Map(),indexPatAnterior=new Map(),indexSerie=new Map(),indexImei=new Map(),coletas=[],sessao={},scanner=null,ultimoScan="",ultimoScanEm=0,lanternaLigada=false;
 let audioCtx=null;
 function beep(freq=880,duration=0.12,volume=0.08,type="sine"){
   try{
@@ -113,14 +113,52 @@ function beepDuplicate(){beep(300,0.18,0.10,"square");setTimeout(()=>beep(220,0.
 function norm(v){return String(v??"").trim()}
 function cleanHeader(h){return norm(h).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"")}
 function getAny(o,a){for(const x of a){const k=Object.keys(o).find(y=>cleanHeader(y)===cleanHeader(x));if(k!==undefined&&norm(o[k])!=="")return norm(o[k])}return""}
+function gpatHtmlParse(text){
+  try{
+    const doc=new DOMParser().parseFromString(text,"text/html");
+    const tables=[...doc.querySelectorAll("table")];
+    if(!tables.length)return [];
+    let best=[];
+    for(const table of tables){
+      const rows=[...table.querySelectorAll("tr")].map(tr=>[...tr.querySelectorAll("th,td")].map(td=>norm(td.textContent).replace(/\s+/g," "))).filter(r=>r.some(Boolean));
+      if(rows.length<2)continue;
+      let hi=rows.findIndex(r=>r.some(c=>/patrim[oô]nio/i.test(c)) && r.some(c=>/material/i.test(c)));
+      if(hi<0)continue;
+      const heads=rows[hi].map(x=>x.trim());
+      const data=rows.slice(hi+1).filter(r=>r.some(Boolean)).map(r=>Object.fromEntries(heads.map((x,i)=>[x,r[i]??""])));
+      if(data.length>best.length)best=data;
+    }
+    return best;
+  }catch(e){return []}
+}
+function parseBaseFile(text,name){
+  const lower=(name||"").toLowerCase();
+  if(lower.endsWith(".xls")||lower.endsWith(".html")||lower.endsWith(".htm")||/^\s*</.test(text)){
+    const r=gpatHtmlParse(text); if(r.length)return r;
+  }
+  return csvParse(text);
+}
 function csvParse(t){const first=t.split(/\r?\n/)[0]||"";const d=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length?";":",";const rows=[];let row=[],cell="",q=false;for(let i=0;i<t.length;i++){const c=t[i];if(c==='"'){if(q&&t[i+1]==='"'){cell+='"';i++}else q=!q}else if(c===d&&!q){row.push(cell);cell=""}else if((c==="\n"||c==="\r")&&!q){if(c==="\r"&&t[i+1]==="\n")i++;row.push(cell);if(row.some(x=>x!==""))rows.push(row);row=[];cell=""}else cell+=c}if(cell||row.length){row.push(cell);rows.push(row)}if(rows.length<2)return[];const h=rows[0].map(x=>x.replace(/^\ufeff/,"").trim());return rows.slice(1).map(r=>Object.fromEntries(h.map((x,i)=>[x,r[i]??""])))}
-function rebuild(){indexPat=new Map();indexSerie=new Map();indexImei=new Map();base.forEach(b=>{const p=getAny(b,["Nº Patrimônio","Numero Patrimonio","Patrimônio","Patrimonio"]);const s=getAny(b,["Nº Série","Numero Serie","Série","Serie"]);const i=getAny(b,["IMEI"]);if(p)indexPat.set(p,b);if(s)indexSerie.set(s,b);if(i)indexImei.set(i,b)});localStorage.setItem("cgpl_base",JSON.stringify(base));$("baseStatus").className="status ok";$("baseStatus").textContent=`Base carregada: ${base.length} bens.`}
+function rebuild(){
+ indexPat=new Map();indexPatAnterior=new Map();indexSerie=new Map();indexImei=new Map();
+ base.forEach(b=>{
+   const p=getAny(b,["Nº Patrimônio","Numero Patrimonio","Patrimônio","Patrimonio"]);
+   const pa=getAny(b,["Patrimônio Anterior","Patrimonio Anterior"]);
+   const s=getAny(b,["Nº Série","Numero Serie","Série","Serie"]);
+   const i=getAny(b,["IMEI"]);
+   if(p)indexPat.set(p,b);if(pa)indexPatAnterior.set(pa,b);if(s)indexSerie.set(s,b);if(i)indexImei.set(i,b)
+ });
+ localStorage.setItem("cgpl_base",JSON.stringify(base));
+ const gpat=base.length&&Object.keys(base[0]).some(k=>cleanHeader(k)==="material")&&Object.keys(base[0]).some(k=>cleanHeader(k)==="destinacao");
+ $("baseStatus").className="status ok";
+ $("baseStatus").textContent=`Base carregada: ${base.length} bens${gpat?" — exportação GPAT reconhecida":""}.`;
+}
 function render(){const scope=coletas.filter(x=>!sessao.sala||x.sala===sessao.sala);$("kTotal").textContent=scope.length;$("kConforme").textContent=scope.filter(x=>x.resultado==="CONFORME").length;$("kDiv").textContent=scope.filter(x=>x.resultado.startsWith("DIVERGÊNCIA")).length;$("kFora").textContent=scope.filter(x=>x.resultado==="NÃO CONSTA NA BASE").length;$("kDup").textContent=scope.filter(x=>x.resultado==="JÁ COLETADO").length;$("tbody").innerHTML=coletas.slice().reverse().map(x=>`<tr><td>${x.dataHora}</td><td>${x.codigo}</td><td>${x.descricao||"-"}</td><td>${x.sala||"-"}</td><td>${x.resultado}</td></tr>`).join("")}
 function load(){try{base=JSON.parse(localStorage.getItem("cgpl_base")||"[]");coletas=JSON.parse(localStorage.getItem("cgpl_coletas")||"[]");sessao=JSON.parse(localStorage.getItem("cgpl_sessao")||"{}")}catch(e){}if(base.length)rebuild();render()}
 $("btnImport").onclick=()=>$("fileBase").click();
-$("fileBase").onchange=async e=>{const f=e.target.files[0];if(!f)return;base=csvParse(await f.text());rebuild();render()};
+$("fileBase").onchange=async e=>{const f=e.target.files[0];if(!f)return;base=parseBaseFile(await f.text(),f.name);if(!base.length)return alert("Não foi possível reconhecer a base. Verifique o arquivo exportado pelo GPAT.");rebuild();render()};
 $("btnIniciarSessao").onclick=()=>{sessao={secretaria:norm($("sec").value),uorg:norm($("uorg").value),unidade:norm($("uni").value),edificio:norm($("edi").value),andar:norm($("andar").value),sala:norm($("sala").value),responsavel:norm($("resp").value),agente:norm($("agente").value),obs:norm($("obsSessao").value),iniciadaEm:new Date().toISOString()};localStorage.setItem("cgpl_sessao",JSON.stringify(sessao));$("sessaoStatus").className="status ok";$("sessaoStatus").textContent=`Sessão ativa: ${sessao.edificio||"-"} / ${sessao.andar||"-"} / Sala ${sessao.sala||"-"}`;$("entradaManual").focus()};
-function findBem(c){return indexPat.get(c)||indexSerie.get(c)||indexImei.get(c)||null}
+function findBem(c){return indexPat.get(c)||indexPatAnterior.get(c)||indexSerie.get(c)||indexImei.get(c)||null}
 function classify(b,c){if(!b)return"NÃO CONSTA NA BASE";const ec=getAny(b,["Edifício Cadastrado","Edificio Cadastrado"]),ac=getAny(b,["Andar Cadastrado"]),sc=getAny(b,["Sala Cadastrada"]),rc=getAny(b,["Responsável Cadastrado","Responsavel Cadastrado"]);if((ec&&sessao.edificio&&ec!==sessao.edificio)||(ac&&sessao.andar&&ac!==sessao.andar)||(sc&&sessao.sala&&sc!==sessao.sala))return"DIVERGÊNCIA DE LOCALIZAÇÃO";if(rc&&sessao.responsavel&&rc!==sessao.responsavel)return"DIVERGÊNCIA DE RESPONSÁVEL";return"CONFORME"}
 function register(code,semEtiqueta=false){
   code=norm(code);
@@ -157,7 +195,7 @@ function register(code,semEtiqueta=false){
   $("ultimoCodigo").textContent=rec.codigo;
   $("resultadoLeitura").className="status "+(r==="CONFORME"?"ok":r==="NÃO CONSTA NA BASE"?"bad":"warning");
   $("resultadoLeitura").textContent=r;
-  $("detalhesBem").innerHTML=b?`<div class="card" style="background:#f8fafc"><b>${rec.patrimonio||rec.codigo}</b> — ${rec.descricao||"Sem descrição"}<br><b>Série:</b> ${rec.serie||"-"} &nbsp; <b>IMEI:</b> ${rec.imei||"-"}</div>`:"";
+  $("detalhesBem").innerHTML=b?`<div class="card" style="background:#f8fafc"><b>${rec.patrimonio||rec.codigo}</b> — ${rec.descricao||"Sem descrição"}<br><b>Série:</b> ${rec.serie||"-"} &nbsp; <b>IMEI:</b> ${rec.imei||"-"}<br><b>UORG GPAT:</b> ${getAny(b,["UORG"])||"-"}<br><b>Destinação:</b> ${getAny(b,["Destinação","Destinacao"])||"-"}<br><b>Detentor GPAT:</b> ${getAny(b,["Detentor"])||"-"}<br><b>Patrimônio anterior:</b> ${getAny(b,["Patrimônio Anterior","Patrimonio Anterior"])||"-"}</div>`:"";
 
   // Confirmação sonora e vibração para coleta registrada.
   beepSuccess();

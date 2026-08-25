@@ -34,3 +34,14 @@ ATUALIZAÇÃO V2.2
 
 OBSERVAÇÃO IOS
 O Safari pode exigir uma primeira interação do usuário para liberar áudio. Como a câmera é iniciada por toque, normalmente o áudio já fica autorizado após o início da coleta.
+
+
+ATUALIZAÇÃO V2.3 — GPAT
+- importa diretamente o arquivo .xls exportado pelo GPAT, mesmo quando o conteúdo interno é HTML;
+- reconhece Patrimônio, Material, Marca, Modelo, Série, Fabricante, UORG, Destinação, Patrimônio Anterior, Tombamento, Conta Contábil e Detentor;
+- pesquisa também por Patrimônio Anterior e Série;
+- exibe UORG, Destinação, Detentor e Patrimônio Anterior após a leitura;
+- mantém alerta sonoro e bloqueio de duplicidade da V2.2.
+
+USO
+No GPAT, exporte a Relação de Patrimônio em .xls. No Coletor, toque em Importar GPAT (.xls) ou CSV e selecione o arquivo original, sem conversão.
