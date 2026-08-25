@@ -1,0 +1,3 @@
+﻿"Nº Patrimônio";"Descrição do Bem";"Tipo de Bem";"Marca";"Modelo";"Nº Série";"IMEI";"Situação Cadastral";"UORG";"Secretaria Cadastrada";"Unidade Cadastrada";"Edifício Cadastrado";"Andar Cadastrado";"Sala Cadastrada";"Responsável Cadastrado";"Valor";"Observações"
+"100001";"Notebook corporativo";"Equipamento de TIC";"Dell";"Latitude";"SN-001";"";"Ativo";"23034";"Secretaria-Executiva";"CGPL";"Palácio do Planalto";"Subsolo";"02";"Servidor Exemplo";"6500,00";"EXEMPLO"
+"100002";"Telefone celular";"Telefonia";"Apple";"iPhone";"SN-002";"123456789012345";"Ativo";"23034";"Secretaria-Executiva";"CGPL";"Palácio do Planalto";"2º";"210";"Servidor Exemplo";"5000,00";"EXEMPLO"
