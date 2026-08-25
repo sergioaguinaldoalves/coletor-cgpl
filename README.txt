@@ -22,3 +22,15 @@ PARA ATUALIZAR NO GITHUB
 
 DICA PARA A ETIQUETA
 Mantenha a etiqueta horizontal, sem reflexo, e aproxime/afaste lentamente até as barras ocuparem quase toda a faixa de leitura.
+
+
+ATUALIZAÇÃO V2.2
+- emite dois bipes curtos quando uma coleta é registrada;
+- mantém vibração curta de confirmação;
+- ao ler novamente o mesmo patrimônio/código, emite alerta sonoro diferente;
+- mostra a mensagem "JÁ COLETADO — registro duplicado bloqueado";
+- não grava uma segunda linha no histórico;
+- mantém câmera 1D, Bluetooth, lanterna, importação CSV e exportação.
+
+OBSERVAÇÃO IOS
+O Safari pode exigir uma primeira interação do usuário para liberar áudio. Como a câmera é iniciada por toque, normalmente o áudio já fica autorizado após o início da coleta.
