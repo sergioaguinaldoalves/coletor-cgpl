@@ -29,7 +29,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 </style>
 </head>
 <body>
-<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.4 — registro completo dos dados GPAT</div></header>
+<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.6 — Mapeamento de Bens</div></header>
 <main>
 <section class="card">
 <h2>1. Base patrimonial</h2>
@@ -38,16 +38,51 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 </section>
 
 <section class="card">
-<h2>2. Sessão de coleta</h2>
+<h2>2. Mapeamento de Bens</h2>
 <div class="grid">
-<div><label>Secretaria</label><input id="sec"></div><div><label>UORG</label><input id="uorg"></div>
-<div><label>Unidade</label><input id="uni"></div><div><label>Edifício</label><input id="edi"></div>
-<div><label>Andar</label><input id="andar"></div><div><label>Sala</label><input id="sala"></div>
-<div><label>Responsável/Detentor</label><input id="resp"></div><div><label>Agente da coleta</label><input id="agente"></div>
+<div><label>Unidade Administrativa Patrimonial - UAP</label>
+<select id="sec">
+<option value="">Selecione...</option>
+<option value="GM/SECOM">Gabinete da Secretaria de Comunicação Social — GM/SECOM</option>
+<option value="CONJUR/SECOM">Consultoria Jurídica — CONJUR/SECOM</option>
+<option value="AESP/SECOM">Assessoria Especial — AESP/SECOM</option>
+<option value="APADI/SECOM">Assessoria de Participação Social e Diversidade — APADI/SECOM</option>
+<option value="SE/SECOM">Secretaria-Executiva — SE/SECOM</option>
+<option value="SUBNOR/SE">Subsecretaria de Gestão e Normas — SUBNOR/SE</option>
+<option value="SIMP">Secretaria de Imprensa — SIMP</option>
+<option value="SPP">Secretaria de Publicidade e Patrocínios — SPP</option>
+<option value="SECOI">Secretaria de Comunicação Institucional — SECOI</option>
+<option value="SEAUD">Secretaria de Produção e Divulgação de Conteúdo Audiovisual — SEAUD</option>
+<option value="SPDIGI">Secretaria de Políticas Digitais — SPDIGI</option>
+<option value="SERES">Secretaria de Estratégias e Redes — SERES</option>
+</select></div>
+
+<div><label>UORG</label>
+<select id="uorg">
+<option value="">Selecione...</option>
+<option value="23034 - Palácio do Planalto">23034 — Palácio do Planalto</option>
+<option value="138528 - Anexo Bloco R">138528 — Anexo Bloco "R"</option>
+<option value="138523 - Anexo Palácio do Planalto">138523 — Anexo Palácio do Planalto</option>
+<option value="148230 - Bens de uso individual">148230 — Bens de uso individual</option>
+</select></div>
+
+<div><label>Unidade</label><input id="uni"></div>
+<div><label>Andar / Localização</label>
+<select id="andar"><option value="">Selecione primeiro a UORG...</option></select>
+<input id="andarLivre" placeholder="Informe a localização" style="display:none;margin-top:8px">
+</div>
+<div><label>Sala</label><input id="sala"></div>
+<div><label>Responsável/Detentor</label><input id="resp"></div>
+<div><label>Agente da coleta</label>
+<select id="agente">
+<option value="">Selecione...</option>
+<option>Joseildes</option><option>Franciélio</option><option>Sérgio</option><option>João</option>
+<option>Adrielle</option><option>Jéssica</option><option>Tavares</option><option>Júnia</option>
+</select></div>
 </div>
 <label style="margin-top:10px">Observação</label><textarea id="obsSessao"></textarea>
-<div class="actions" style="margin-top:10px"><button class="good" id="btnIniciarSessao">Iniciar / Atualizar sessão</button></div>
-<div id="sessaoStatus" class="status info">Sessão ainda não iniciada.</div>
+<div class="actions" style="margin-top:10px"><button class="good" id="btnIniciarSessao">Iniciar / Atualizar mapeamento</button></div>
+<div id="sessaoStatus" class="status info">Mapeamento ainda não iniciado.</div>
 </section>
 
 <section class="card">
@@ -74,13 +109,23 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 <div id="formatoDetectado" class="muted" style="text-align:center;margin-top:4px">Formato: aguardando leitura</div>
 <div id="resultadoLeitura" class="status info">Nenhuma leitura realizada nesta sessão.</div>
 <div id="detalhesBem"></div>
+<div id="foraBaseBox" class="card" style="display:none;margin-top:12px;background:#fff7ed;border:1px solid #fdba74">
+  <h3 style="margin-top:0">Bem não localizado na base GPAT</h3>
+  <p class="muted">Para incluir este patrimônio no mapeamento, informe obrigatoriamente o material do bem.</p>
+  <label>Material *</label>
+  <input id="materialForaBase" placeholder="Ex.: cadeira, mesa, computador, monitor">
+  <div class="actions" style="margin-top:8px">
+    <button class="good" id="btnConfirmarForaBase">Confirmar inclusão</button>
+    <button class="secondary" id="btnCancelarForaBase">Cancelar</button>
+  </div>
+</div>
 </section>
 
 <section class="card">
 <h2>4. Resumo</h2>
 <div class="kpis">
 <div class="kpi"><b id="kTotal">0</b>Total</div><div class="kpi"><b id="kConforme">0</b>Conformes</div>
-<div class="kpi"><b id="kDiv">0</b>Divergências</div><div class="kpi"><b id="kFora">0</b>Fora da base</div><div class="kpi"><b id="kDup">0</b>Duplicados</div>
+<div class="kpi"><b id="kDiv">0</b>Divergências</div><div class="kpi"><b id="kFora">0</b>Fora da base</div>
 </div>
 </section>
 
@@ -93,7 +138,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 
 <script>
 const $=id=>document.getElementById(id);
-let base=[],indexPat=new Map(),indexPatAnterior=new Map(),indexSerie=new Map(),indexImei=new Map(),coletas=[],sessao={},scanner=null,ultimoScan="",ultimoScanEm=0,lanternaLigada=false;
+let base=[],indexPat=new Map(),indexPatAnterior=new Map(),indexSerie=new Map(),indexImei=new Map(),coletas=[],sessao={},scanner=null,ultimoScan="",ultimoScanEm=0,lanternaLigada=false,pendenteForaBase="";
 let audioCtx=null;
 function beep(freq=880,duration=0.12,volume=0.08,type="sine"){
   try{
@@ -153,35 +198,52 @@ function rebuild(){
  $("baseStatus").className="status ok";
  $("baseStatus").textContent=`Base carregada: ${base.length} bens${gpat?" — exportação GPAT reconhecida":""}.`;
 }
-function render(){const scope=coletas.filter(x=>!sessao.sala||x.sala===sessao.sala);$("kTotal").textContent=scope.length;$("kConforme").textContent=scope.filter(x=>x.resultado==="CONFORME").length;$("kDiv").textContent=scope.filter(x=>x.resultado.startsWith("DIVERGÊNCIA")).length;$("kFora").textContent=scope.filter(x=>x.resultado==="NÃO CONSTA NA BASE").length;$("kDup").textContent=scope.filter(x=>x.resultado==="JÁ COLETADO").length;$("tbody").innerHTML=coletas.slice().reverse().map(x=>`<tr><td>${x.dataHora}</td><td>${x.patrimonio||x.codigo}</td><td>${x.material||x.descricao||"-"}</td><td>${x.uorgGPAT||"-"}</td><td>${x.detentor||"-"}</td><td>${x.sala||"-"}</td><td>${x.resultado}</td></tr>`).join("")}
+function render(){const scope=coletas.filter(x=>!sessao.sala||x.sala===sessao.sala);$("kTotal").textContent=scope.length;$("kConforme").textContent=scope.filter(x=>x.resultado==="CONFORME").length;$("kDiv").textContent=scope.filter(x=>x.resultado.startsWith("DIVERGÊNCIA")).length;$("kFora").textContent=scope.filter(x=>x.resultado==="NÃO CONSTA NA BASE").length;$("tbody").innerHTML=coletas.slice().reverse().map(x=>`<tr><td>${x.dataHora}</td><td>${x.patrimonio||x.codigo}</td><td>${x.material||x.descricao||"-"}</td><td>${x.uorgGPAT||"-"}</td><td>${x.detentor||"-"}</td><td>${x.sala||"-"}</td><td>${x.resultado}</td></tr>`).join("")}
 function load(){try{base=JSON.parse(localStorage.getItem("cgpl_base")||"[]");coletas=JSON.parse(localStorage.getItem("cgpl_coletas")||"[]");sessao=JSON.parse(localStorage.getItem("cgpl_sessao")||"{}")}catch(e){}if(base.length)rebuild();render()}
 $("btnImport").onclick=()=>$("fileBase").click();
 $("fileBase").onchange=async e=>{const f=e.target.files[0];if(!f)return;base=parseBaseFile(await f.text(),f.name);if(!base.length)return alert("Não foi possível reconhecer a base. Verifique o arquivo exportado pelo GPAT.");rebuild();render()};
-$("btnIniciarSessao").onclick=()=>{sessao={secretaria:norm($("sec").value),uorg:norm($("uorg").value),unidade:norm($("uni").value),edificio:norm($("edi").value),andar:norm($("andar").value),sala:norm($("sala").value),responsavel:norm($("resp").value),agente:norm($("agente").value),obs:norm($("obsSessao").value),iniciadaEm:new Date().toISOString()};localStorage.setItem("cgpl_sessao",JSON.stringify(sessao));$("sessaoStatus").className="status ok";$("sessaoStatus").textContent=`Sessão ativa: ${sessao.edificio||"-"} / ${sessao.andar||"-"} / Sala ${sessao.sala||"-"}`;$("entradaManual").focus()};
+$("btnIniciarSessao").onclick=()=>{const loc=(($("uorg").value==="148230 - Bens de uso individual"||$("andar").value==="Outro")?norm($("andarLivre").value):norm($("andar").value));sessao={secretaria:norm($("sec").value),uorg:norm($("uorg").value),unidade:norm($("uni").value),edificio:"",andar:loc,sala:norm($("sala").value),responsavel:norm($("resp").value),agente:norm($("agente").value),obs:norm($("obsSessao").value),iniciadaEm:new Date().toISOString()};localStorage.setItem("cgpl_sessao",JSON.stringify(sessao));$("sessaoStatus").className="status ok";$("sessaoStatus").textContent=`Mapeamento ativo: ${sessao.uorg||"-"} / ${sessao.andar||"-"} / Sala ${sessao.sala||"-"}`;$("entradaManual").focus()};
 function findBem(c){return indexPat.get(c)||indexPatAnterior.get(c)||indexSerie.get(c)||indexImei.get(c)||null}
 function classify(b,c){if(!b)return"NÃO CONSTA NA BASE";const ec=getAny(b,["Edifício Cadastrado","Edificio Cadastrado"]),ac=getAny(b,["Andar Cadastrado"]),sc=getAny(b,["Sala Cadastrada"]),rc=getAny(b,["Responsável Cadastrado","Responsavel Cadastrado"]);if((ec&&sessao.edificio&&ec!==sessao.edificio)||(ac&&sessao.andar&&ac!==sessao.andar)||(sc&&sessao.sala&&sc!==sessao.sala))return"DIVERGÊNCIA DE LOCALIZAÇÃO";if(rc&&sessao.responsavel&&rc!==sessao.responsavel)return"DIVERGÊNCIA DE RESPONSÁVEL";return"CONFORME"}
-function register(code,semEtiqueta=false){
+function register(code,semEtiqueta=false,materialManual=""){
   code=norm(code);
   if(!code&&!semEtiqueta)return;
-  if(!sessao.iniciadaEm)return alert("Inicie uma sessão primeiro.");
+  if(!sessao.iniciadaEm)return alert("Inicie o mapeamento primeiro.");
 
-  // Não registra novamente o mesmo código/patrimônio.
-  if(code && coletas.some(x=>x.codigo===code || (x.patrimonio && x.patrimonio===code))){
-    $("ultimoCodigo").textContent=code;
+  const b=code?findBem(code):null;
+  const patrimonioBase=b?getAny(b,["Patrimônio","Patrimonio","Nº Patrimônio"]):"";
+
+  // Duplicidade: alerta e bloqueia, mas não entra no resumo porque não é coletado.
+  if(code && coletas.some(x=>x.codigo===code || (patrimonioBase && x.patrimonio===patrimonioBase) || (x.patrimonio && x.patrimonio===code))){
+    $("ultimoCodigo").textContent=patrimonioBase||code;
     $("resultadoLeitura").className="status warning";
     $("resultadoLeitura").textContent="JÁ COLETADO — registro duplicado bloqueado";
-    $("detalhesBem").innerHTML='<div class="status warning">Este patrimônio já consta no histórico e não foi registrado novamente.</div>';
+    $("detalhesBem").innerHTML='<div class="status warning">Este patrimônio já consta no mapeamento e não foi coletado novamente.</div>';
+    $("foraBaseBox").style.display="none";
+    pendenteForaBase="";
     beepDuplicate();
     if(navigator.vibrate)navigator.vibrate([180,100,180]);
     return;
   }
 
-  const b=code?findBem(code):null;
-  const r=semEtiqueta?"SEM ETIQUETA / ILEGÍVEL":classify(b,code);
+  // Bem fora da base: não registra antes do preenchimento obrigatório de Material.
+  if(!b && code && !materialManual){
+    pendenteForaBase=code;
+    $("ultimoCodigo").textContent=code;
+    $("resultadoLeitura").className="status warning";
+    $("resultadoLeitura").textContent="NÃO CONSTA NA BASE — informe o material para incluir";
+    $("detalhesBem").innerHTML='<div class="status info">O patrimônio foi lido, mas ainda <b>não foi incluído</b> no mapeamento.</div>';
+    $("materialForaBase").value="";
+    $("foraBaseBox").style.display="block";
+    setTimeout(()=>$("materialForaBase").focus(),50);
+    return;
+  }
+
+  const r=semEtiqueta?"SEM ETIQUETA / ILEGÍVEL":(!b?"NÃO CONSTA NA BASE":classify(b,code));
   const rec={
     dataHora:new Date().toLocaleString("pt-BR"),codigo:code||"SEM ETIQUETA",
-    patrimonio:b?getAny(b,["Patrimônio","Patrimonio","Nº Patrimônio"]):"",
-    material:b?getAny(b,["Material"]):"",
+    patrimonio:b?getAny(b,["Patrimônio","Patrimonio","Nº Patrimônio"]):(code||""),
+    material:b?getAny(b,["Material"]):norm(materialManual),
     marca:b?getAny(b,["Marca"]):"",
     modelo:b?getAny(b,["Modelo"]):"",
     serie:b?getAny(b,["Série","Serie","Nº Série"]):"",
@@ -193,21 +255,22 @@ function register(code,semEtiqueta=false){
     contaContabil:b?getAny(b,["Conta Contábil","Conta Contabil"]):"",
     detentor:b?getAny(b,["Detentor"]):"",
     secretaria:sessao.secretaria,uorg:sessao.uorg,unidade:sessao.unidade,
-    edificio:sessao.edificio,andar:sessao.andar,sala:sessao.sala,
+    edificio:"",andar:sessao.andar,sala:sessao.sala,
     responsavel:sessao.responsavel,agente:sessao.agente,resultado:r,
-    descricao:b?getAny(b,["Material","Descrição do Bem","Descricao do Bem"]):"",
+    descricao:b?getAny(b,["Material","Descrição do Bem","Descricao do Bem"]):norm(materialManual),
     tipo:b?getAny(b,["Conta Contábil","Conta Contabil","Tipo de Bem"]):"",
     imei:b?getAny(b,["IMEI"]):""
   };
   coletas.push(rec);
   localStorage.setItem("cgpl_coletas",JSON.stringify(coletas));
 
-  $("ultimoCodigo").textContent=rec.codigo;
-  $("resultadoLeitura").className="status "+(r==="CONFORME"?"ok":r==="NÃO CONSTA NA BASE"?"bad":"warning");
+  pendenteForaBase="";
+  $("foraBaseBox").style.display="none";
+  $("ultimoCodigo").textContent=rec.patrimonio||rec.codigo;
+  $("resultadoLeitura").className="status "+(r==="CONFORME"?"ok":r==="NÃO CONSTA NA BASE"?"warning":"warning");
   $("resultadoLeitura").textContent=r;
-  $("detalhesBem").innerHTML=b?`<div class="card" style="background:#f8fafc"><b>${rec.patrimonio||rec.codigo}</b> — ${rec.descricao||"Sem descrição"}<br><b>Série:</b> ${rec.serie||"-"} &nbsp; <b>IMEI:</b> ${rec.imei||"-"}<br><b>UORG GPAT:</b> ${getAny(b,["UORG"])||"-"}<br><b>Destinação:</b> ${getAny(b,["Destinação","Destinacao"])||"-"}<br><b>Detentor GPAT:</b> ${getAny(b,["Detentor"])||"-"}<br><b>Patrimônio anterior:</b> ${getAny(b,["Patrimônio Anterior","Patrimonio Anterior"])||"-"}</div>`:"";
+  $("detalhesBem").innerHTML=b?`<div class="card" style="background:#f8fafc"><b>${rec.patrimonio||rec.codigo}</b> — ${rec.material||"Sem descrição"}<br><b>Marca:</b> ${rec.marca||"-"} &nbsp; <b>Modelo:</b> ${rec.modelo||"-"}<br><b>Série:</b> ${rec.serie||"-"}<br><b>Fabricante:</b> ${rec.fabricante||"-"}<br><b>UORG GPAT:</b> ${rec.uorgGPAT||"-"}<br><b>Destinação:</b> ${rec.destinacao||"-"}<br><b>Patrimônio anterior:</b> ${rec.patrimonioAnterior||"-"}<br><b>Tombamento:</b> ${rec.tombamento||"-"}<br><b>Conta Contábil:</b> ${rec.contaContabil||"-"}<br><b>Detentor GPAT:</b> ${rec.detentor||"-"}</div>`:`<div class="card" style="background:#fff7ed"><b>${rec.patrimonio}</b> — ${rec.material}<br><b>Situação:</b> bem incluído manualmente por não constar na base GPAT.</div>`;
 
-  // Confirmação sonora e vibração para coleta registrada.
   beepSuccess();
   if(navigator.vibrate)navigator.vibrate(80);
   render();
@@ -215,6 +278,28 @@ function register(code,semEtiqueta=false){
 $("btnAdicionar").onclick=()=>{register($("entradaManual").value);$("entradaManual").value="";$("entradaManual").focus()};
 $("entradaManual").addEventListener("keydown",e=>{if(e.key==="Enter")$("btnAdicionar").click()});
 $("btnSemEtiqueta").onclick=()=>register("",true);
+$("btnConfirmarForaBase").onclick=()=>{
+  const material=norm($("materialForaBase").value);
+  if(!pendenteForaBase)return;
+  if(!material){
+    alert("Informe o material do bem para incluí-lo no mapeamento.");
+    $("materialForaBase").focus();
+    return;
+  }
+  const codigo=pendenteForaBase;
+  register(codigo,false,material);
+  $("entradaManual").value="";
+  $("entradaManual").focus();
+};
+$("materialForaBase").addEventListener("keydown",e=>{if(e.key==="Enter")$("btnConfirmarForaBase").click()});
+$("btnCancelarForaBase").onclick=()=>{
+  pendenteForaBase="";
+  $("materialForaBase").value="";
+  $("foraBaseBox").style.display="none";
+  $("resultadoLeitura").className="status info";
+  $("resultadoLeitura").textContent="Inclusão cancelada. O patrimônio não foi registrado.";
+  $("entradaManual").focus();
+};
 
 $("btnCamera").onclick=async()=>{
  if(scanner)return;
@@ -239,9 +324,34 @@ $("btnPararCamera").onclick=async()=>{if(scanner){try{await scanner.stop();await
 $("btnLanterna").onclick=async()=>{if(!scanner)return alert("Inicie a câmera primeiro.");try{const caps=scanner.getRunningTrackCapabilities?.();if(!caps?.torch)return alert("Lanterna não disponível neste aparelho/navegador.");lanternaLigada=!lanternaLigada;await scanner.applyVideoConstraints({advanced:[{torch:lanternaLigada}]});$("btnLanterna").textContent=lanternaLigada?"Apagar lanterna":"Lanterna"}catch(e){alert("Não foi possível controlar a lanterna.")}};
 
 function csvCell(v){return `"${String(v??"").replaceAll('"','""')}"`}
-$("btnExportar").onclick=()=>{if(!coletas.length)return alert("Nenhuma coleta.");const cab=["Data/Hora","Patrimônio","Material","Marca","Modelo","Série","Fabricante","UORG","Destinação","Patrimônio Anterior","Tombamento","Conta Contábil","Detentor","Secretaria Encontrada","UORG Encontrada","Unidade Encontrada","Edifício Encontrado","Andar Encontrado","Sala Encontrada","Responsável Encontrado","Agente da Coleta","Resultado"];const lines=[cab.map(csvCell).join(";"),...coletas.map(x=>[x.dataHora,x.patrimonio,x.material||x.descricao,x.marca,x.modelo,x.serie,x.fabricante,x.uorgGPAT,x.destinacao,x.patrimonioAnterior,x.tombamento,x.contaContabil,x.detentor,x.secretaria,x.uorg,x.unidade,x.edificio,x.andar,x.sala,x.responsavel,x.agente,x.resultado].map(csvCell).join(";"))];const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CGPL_coleta_patrimonial_GPAT_completa.csv";a.click();URL.revokeObjectURL(a.href)};
+$("btnExportar").onclick=()=>{if(!coletas.length)return alert("Nenhuma coleta.");const cab=["Data/Hora","Patrimônio","Material","Marca","Modelo","Série","Fabricante","UORG","Destinação","Patrimônio Anterior","Tombamento","Conta Contábil","Detentor","Secretaria Encontrada","UORG Encontrada","Unidade Encontrada","Andar Encontrado","Sala Encontrada","Responsável Encontrado","Agente da Coleta","Resultado"];const lines=[cab.map(csvCell).join(";"),...coletas.map(x=>[x.dataHora,x.patrimonio,x.material||x.descricao,x.marca,x.modelo,x.serie,x.fabricante,x.uorgGPAT,x.destinacao,x.patrimonioAnterior,x.tombamento,x.contaContabil,x.detentor,x.secretaria,x.uorg,x.unidade,x.andar,x.sala,x.responsavel,x.agente,x.resultado].map(csvCell).join(";"))];const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CGPL_coleta_patrimonial_GPAT_completa.csv";a.click();URL.revokeObjectURL(a.href)};
 $("btnLimpar").onclick=()=>{if(confirm("Excluir todas as coletas deste dispositivo?")){coletas=[];localStorage.removeItem("cgpl_coletas");render()}};
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+const locaisPorUorg={
+ "23034 - Palácio do Planalto":["4º Andar","3º Andar","2º Andar","Térreo","Subsolo","Garagem","Outro"],
+ "138523 - Anexo Palácio do Planalto":["Térreo - Anexo I - Ala A","Térreo - Anexo I - Ala B","Térreo - Anexo II - Ala A","Térreo - Anexo II - Ala B","Térreo - Anexo III - Ala A","Térreo - Anexo III - Ala B","Térreo - Anexo VI - Ala A","Térreo - Anexo VI - Ala B","2º andar - Anexo I - Ala A","2º andar - Anexo I - Ala B","2º andar - Anexo II - Ala A","2º andar - Anexo II - Ala B","2º andar - Anexo III - Ala A","2º andar - Anexo III - Ala B","Outro"],
+ "138528 - Anexo Bloco R":["3º andar - Ala Leste","3º andar - Ala Oeste","Térreo","Subsolo","Garagem","Outro"],
+ "148230 - Bens de uso individual":[]
+};
+function atualizarLocaisUorg(){
+ const u=$("uorg").value,sel=$("andar"),livre=$("andarLivre"),locais=locaisPorUorg[u]||[];
+ sel.innerHTML="";
+ if(u==="148230 - Bens de uso individual"){
+   sel.style.display="none";livre.style.display="block";livre.value="";livre.placeholder="Preencher localização na hora";return;
+ }
+ sel.style.display="block";livre.style.display="none";livre.value="";
+ const op=document.createElement("option");op.value="";op.textContent=u?"Selecione...":"Selecione primeiro a UORG...";sel.appendChild(op);
+ locais.forEach(v=>{const x=document.createElement("option");x.value=v;x.textContent=v;sel.appendChild(x)});
+}
+$("uorg").addEventListener("change",atualizarLocaisUorg);
+$("andar").addEventListener("change",()=>{
+ const livre=$("andarLivre");
+ if($("andar").value==="Outro"){livre.style.display="block";livre.value="";livre.placeholder="Informe a localização";}
+ else if($("uorg").value!=="148230 - Bens de uso individual"){livre.style.display="none";livre.value="";}
+});
+atualizarLocaisUorg();
+
 load();
 </script>
 </body></html>

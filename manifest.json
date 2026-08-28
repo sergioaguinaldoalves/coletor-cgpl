@@ -3,8 +3,8 @@
   "short_name": "Coletor CGPL",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#EEF2F6",
-  "theme_color": "#17365D",
+  "background_color": "#eef2f6",
+  "theme_color": "#17365d",
   "icons": [
     {
       "src": "icon-192.png",
