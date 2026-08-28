@@ -1,11 +1,12 @@
-COLETOR PATRIMONIAL CGPL — V2.6
+COLETOR PATRIMONIAL CGPL — V2.7
 
-- Item 2: Mapeamento de Bens.
-- UAP, UORG, localização e agente de coleta padronizados.
-- Campo Edifício removido.
-- Bem fora da base GPAT não é registrado imediatamente.
-- Após a leitura de patrimônio não localizado, o sistema exige o preenchimento do Material.
-- Somente após confirmar o Material o registro é incluído no mapeamento.
-- Patrimônio duplicado permanece bloqueado, com alerta, sem novo registro.
-- Indicador de Duplicados retirado do item 4 - Resumo.
-- Mantidas câmera, Bluetooth, importação GPAT, histórico e exportação.
+ALTERAÇÕES
+- Bem fora da base: Material obrigatório; Marca, Modelo e Série opcionais.
+- O registro só é incluído após o Material ser preenchido.
+- Digitar SRP no campo de coleta identifica "Sem Registro de Patrimônio".
+- O botão passa a "Bem sem patrimônio (SRP)".
+- SRP usa o mesmo formulário: Material obrigatório; Marca, Modelo e Série opcionais.
+- Registros SRP podem ser repetidos, pois cada lançamento representa um bem distinto sem patrimônio.
+- Resumo: "Divergências" substituído por "Sem patrimônio".
+- Duplicidades patrimoniais continuam bloqueadas e não entram no resumo.
+- Exportação inclui "Código de Coleta" para registrar explicitamente SRP.
