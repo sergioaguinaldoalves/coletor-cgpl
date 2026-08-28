@@ -29,12 +29,18 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 </style>
 </head>
 <body>
-<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.7 — Mapeamento de Bens</div></header>
+<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.8 — Múltiplas Bases Patrimoniais</div></header>
 <main>
 <section class="card">
 <h2>1. Base patrimonial</h2>
-<div class="actions"><button id="btnImport">Importar GPAT (.xls) ou CSV</button><input class="hidden" type="file" id="fileBase" accept=".xls,.html,.htm,.csv,text/csv,text/html,application/vnd.ms-excel"/></div>
+<p class="muted">Você pode carregar várias bases GPAT ou CSV. Todas serão consolidadas para consulta durante o mapeamento.</p>
+<div class="actions">
+<button id="btnImport">Adicionar base(s)</button>
+<button class="secondary" id="btnLimparBases">Limpar todas as bases</button>
+<input class="hidden" type="file" id="fileBase" multiple accept=".xls,.html,.htm,.csv,text/csv,text/html,application/vnd.ms-excel"/>
+</div>
 <div id="baseStatus" class="status info">Nenhuma base carregada.</div>
+<div id="listaBases" style="margin-top:10px"></div>
 </section>
 
 <section class="card">
@@ -142,7 +148,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 
 <script>
 const $=id=>document.getElementById(id);
-let base=[],indexPat=new Map(),indexPatAnterior=new Map(),indexSerie=new Map(),indexImei=new Map(),coletas=[],sessao={},scanner=null,ultimoScan="",ultimoScanEm=0,lanternaLigada=false,pendenteForaBase="",tipoPendenteManual="";
+let base=[],basesCarregadas=[],indexPat=new Map(),indexPatAnterior=new Map(),indexSerie=new Map(),indexImei=new Map(),coletas=[],sessao={},scanner=null,ultimoScan="",ultimoScanEm=0,lanternaLigada=false,pendenteForaBase="",tipoPendenteManual="";
 let audioCtx=null;
 function beep(freq=880,duration=0.12,volume=0.08,type="sine"){
   try{
@@ -189,23 +195,81 @@ function parseBaseFile(text,name){
 }
 function csvParse(t){const first=t.split(/\r?\n/)[0]||"";const d=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length?";":",";const rows=[];let row=[],cell="",q=false;for(let i=0;i<t.length;i++){const c=t[i];if(c==='"'){if(q&&t[i+1]==='"'){cell+='"';i++}else q=!q}else if(c===d&&!q){row.push(cell);cell=""}else if((c==="\n"||c==="\r")&&!q){if(c==="\r"&&t[i+1]==="\n")i++;row.push(cell);if(row.some(x=>x!==""))rows.push(row);row=[];cell=""}else cell+=c}if(cell||row.length){row.push(cell);rows.push(row)}if(rows.length<2)return[];const h=rows[0].map(x=>x.replace(/^\ufeff/,"").trim());return rows.slice(1).map(r=>Object.fromEntries(h.map((x,i)=>[x,r[i]??""])))}
 function rebuild(){
- indexPat=new Map();indexPatAnterior=new Map();indexSerie=new Map();indexImei=new Map();
- base.forEach(b=>{
-   const p=getAny(b,["Nº Patrimônio","Numero Patrimonio","Patrimônio","Patrimonio"]);
-   const pa=getAny(b,["Patrimônio Anterior","Patrimonio Anterior"]);
-   const s=getAny(b,["Nº Série","Numero Serie","Série","Serie"]);
-   const i=getAny(b,["IMEI"]);
-   if(p)indexPat.set(p,b);if(pa)indexPatAnterior.set(pa,b);if(s)indexSerie.set(s,b);if(i)indexImei.set(i,b)
- });
- localStorage.setItem("cgpl_base",JSON.stringify(base));
- const gpat=base.length&&Object.keys(base[0]).some(k=>cleanHeader(k)==="material")&&Object.keys(base[0]).some(k=>cleanHeader(k)==="destinacao");
- $("baseStatus").className="status ok";
- $("baseStatus").textContent=`Base carregada: ${base.length} bens${gpat?" — exportação GPAT reconhecida":""}.`;
+  base=[];
+  const vistos=new Map();
+  let duplicados=0;
+  for(const pacote of basesCarregadas){
+    for(const item of pacote.dados){
+      const pat=getAny(item,["Patrimônio","Patrimonio","Nº Patrimônio"]);
+      if(pat){
+        if(vistos.has(pat)){duplicados++;continue;}
+        vistos.set(pat,true);
+      }
+      base.push(item);
+    }
+  }
+  indexPat=new Map();indexPatAnterior=new Map();indexSerie=new Map();indexImei=new Map();
+  for(const b of base){
+    const p=getAny(b,["Patrimônio","Patrimonio","Nº Patrimônio"]),pa=getAny(b,["Patrimônio Anterior","Patrimonio Anterior"]),s=getAny(b,["Série","Serie","Nº Série"]),i=getAny(b,["IMEI"]);
+    if(p&&!indexPat.has(p))indexPat.set(p,b);
+    if(pa&&!indexPatAnterior.has(pa))indexPatAnterior.set(pa,b);
+    if(s&&!indexSerie.has(s))indexSerie.set(s,b);
+    if(i&&!indexImei.has(i))indexImei.set(i,b);
+  }
+  localStorage.setItem("cgpl_bases",JSON.stringify(basesCarregadas));
+  localStorage.setItem("cgpl_base",JSON.stringify(base));
+  const qtd=basesCarregadas.length;
+  $("baseStatus").className=qtd?"status ok":"status info";
+  $("baseStatus").textContent=qtd?`${qtd} base${qtd>1?"s":""} carregada${qtd>1?"s":""} — ${base.length} bens consolidados${duplicados?` — ${duplicados} patrimônio${duplicados>1?"s":""} repetido${duplicados>1?"s":""} ignorado${duplicados>1?"s":""}`:""}`:"Nenhuma base carregada.";
+  renderBases();
+}
+function renderBases(){
+  if(!basesCarregadas.length){$("listaBases").innerHTML="";return;}
+  $("listaBases").innerHTML=basesCarregadas.map((b,i)=>`<div class="status info" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span><b>${b.nome}</b> — ${b.dados.length} registros</span><button class="danger" style="padding:6px 10px" onclick="removerBase(${i})">Excluir</button></div>`).join("");
+}
+function removerBase(i){
+  if(!confirm(`Excluir a base "${basesCarregadas[i]?.nome||""}"?`))return;
+  basesCarregadas.splice(i,1);rebuild();render();
 }
 function render(){const scope=coletas.filter(x=>!sessao.sala||x.sala===sessao.sala);$("kTotal").textContent=scope.length;$("kConforme").textContent=scope.filter(x=>x.resultado==="CONFORME").length;$("kFora").textContent=scope.filter(x=>x.resultado==="NÃO CONSTA NA BASE").length;$("kSemPat").textContent=scope.filter(x=>x.resultado==="SEM REGISTRO DE PATRIMÔNIO").length;$("tbody").innerHTML=coletas.slice().reverse().map(x=>`<tr><td>${x.dataHora}</td><td>${x.patrimonio||x.codigo}</td><td>${x.material||x.descricao||"-"}</td><td>${x.uorgGPAT||"-"}</td><td>${x.detentor||"-"}</td><td>${x.sala||"-"}</td><td>${x.resultado}</td></tr>`).join("")}
-function load(){try{base=JSON.parse(localStorage.getItem("cgpl_base")||"[]");coletas=JSON.parse(localStorage.getItem("cgpl_coletas")||"[]");sessao=JSON.parse(localStorage.getItem("cgpl_sessao")||"{}")}catch(e){}if(base.length)rebuild();render()}
+function load(){
+  try{
+    basesCarregadas=JSON.parse(localStorage.getItem("cgpl_bases")||"[]");
+    coletas=JSON.parse(localStorage.getItem("cgpl_coletas")||"[]");
+    sessao=JSON.parse(localStorage.getItem("cgpl_sessao")||"{}");
+    // Compatibilidade com versões anteriores: transforma a base antiga em uma base identificada.
+    if(!basesCarregadas.length){
+      const antiga=JSON.parse(localStorage.getItem("cgpl_base")||"[]");
+      if(antiga.length)basesCarregadas=[{nome:"Base anterior",dados:antiga}];
+    }
+  }catch(e){}
+  rebuild();render();
+}
 $("btnImport").onclick=()=>$("fileBase").click();
-$("fileBase").onchange=async e=>{const f=e.target.files[0];if(!f)return;base=parseBaseFile(await f.text(),f.name);if(!base.length)return alert("Não foi possível reconhecer a base. Verifique o arquivo exportado pelo GPAT.");rebuild();render()};
+$("fileBase").onchange=async e=>{
+  const files=[...e.target.files];
+  if(!files.length)return;
+  let adicionadas=0;
+  for(const f of files){
+    const dados=parseBaseFile(await f.text(),f.name);
+    if(!dados.length){alert(`Não foi possível reconhecer a base: ${f.name}`);continue;}
+    // Se o mesmo arquivo for adicionado novamente, substitui sua versão anterior.
+    const idx=basesCarregadas.findIndex(b=>b.nome===f.name);
+    const pacote={nome:f.name,dados};
+    if(idx>=0)basesCarregadas[idx]=pacote;else basesCarregadas.push(pacote);
+    adicionadas++;
+  }
+  e.target.value="";
+  if(adicionadas){rebuild();render();}
+};
+$("btnLimparBases").onclick=()=>{
+  if(!basesCarregadas.length)return;
+  if(confirm("Remover todas as bases patrimoniais deste dispositivo?")){
+    basesCarregadas=[];base=[];
+    localStorage.removeItem("cgpl_bases");localStorage.removeItem("cgpl_base");
+    rebuild();render();
+  }
+};
 $("btnIniciarSessao").onclick=()=>{const loc=(($("uorg").value==="148230 - Bens de uso individual"||$("andar").value==="Outro")?norm($("andarLivre").value):norm($("andar").value));sessao={secretaria:norm($("sec").value),uorg:norm($("uorg").value),unidade:norm($("uni").value),edificio:"",andar:loc,sala:norm($("sala").value),responsavel:norm($("resp").value),agente:norm($("agente").value),obs:norm($("obsSessao").value),iniciadaEm:new Date().toISOString()};localStorage.setItem("cgpl_sessao",JSON.stringify(sessao));$("sessaoStatus").className="status ok";$("sessaoStatus").textContent=`Mapeamento ativo: ${sessao.uorg||"-"} / ${sessao.andar||"-"} / Sala ${sessao.sala||"-"}`;$("entradaManual").focus()};
 function findBem(c){return indexPat.get(c)||indexPatAnterior.get(c)||indexSerie.get(c)||indexImei.get(c)||null}
 function classify(b,c){if(!b)return"NÃO CONSTA NA BASE";const ec=getAny(b,["Edifício Cadastrado","Edificio Cadastrado"]),ac=getAny(b,["Andar Cadastrado"]),sc=getAny(b,["Sala Cadastrada"]),rc=getAny(b,["Responsável Cadastrado","Responsavel Cadastrado"]);if((ec&&sessao.edificio&&ec!==sessao.edificio)||(ac&&sessao.andar&&ac!==sessao.andar)||(sc&&sessao.sala&&sc!==sessao.sala))return"DIVERGÊNCIA DE LOCALIZAÇÃO";if(rc&&sessao.responsavel&&rc!==sessao.responsavel)return"DIVERGÊNCIA DE RESPONSÁVEL";return"CONFORME"}

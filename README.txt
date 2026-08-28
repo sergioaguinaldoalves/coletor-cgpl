@@ -1,12 +1,8 @@
-COLETOR PATRIMONIAL CGPL — V2.7
-
-ALTERAÇÕES
-- Bem fora da base: Material obrigatório; Marca, Modelo e Série opcionais.
-- O registro só é incluído após o Material ser preenchido.
-- Digitar SRP no campo de coleta identifica "Sem Registro de Patrimônio".
-- O botão passa a "Bem sem patrimônio (SRP)".
-- SRP usa o mesmo formulário: Material obrigatório; Marca, Modelo e Série opcionais.
-- Registros SRP podem ser repetidos, pois cada lançamento representa um bem distinto sem patrimônio.
-- Resumo: "Divergências" substituído por "Sem patrimônio".
-- Duplicidades patrimoniais continuam bloqueadas e não entram no resumo.
-- Exportação inclui "Código de Coleta" para registrar explicitamente SRP.
+COLETOR PATRIMONIAL CGPL — V2.8
+- Permite carregar vários arquivos GPAT/CSV.
+- Novas bases são adicionadas sem apagar as anteriores.
+- Lista cada base e sua quantidade de registros.
+- Permite excluir uma base individualmente ou limpar todas.
+- Consolida todas as bases para pesquisa.
+- Patrimônios repetidos entre bases são ignorados na consolidação e sinalizados.
+- Arquivo reimportado com o mesmo nome substitui sua versão anterior.
