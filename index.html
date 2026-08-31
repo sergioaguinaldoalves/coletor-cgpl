@@ -26,11 +26,76 @@ button.secondary{background:#64748b}button.good{background:#2e7d32}button.warn{b
 table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;border-bottom:1px solid #e5e7eb;text-align:left}
 .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.kpi{background:#f8fafc;border-radius:10px;padding:10px;text-align:center}.kpi b{display:block;font-size:24px;color:var(--azul)}
 @media(max-width:760px){.grid,.kpis{grid-template-columns:1fr}.actions button{flex:1 1 45%}}
+
+.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:16px}
+.home-card{border:1px solid #d7dee8;border-radius:16px;padding:22px;background:#fff;cursor:pointer;transition:.15s;min-height:150px}
+.home-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.home-icon{font-size:42px;display:block;margin-bottom:10px}
+.home-card h3{margin:0 0 8px}
+.module-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.module-title{margin:0}
+.module-view{display:none}
+.module-view.active{display:block}
+.consulta-actions{display:flex;gap:8px;flex-wrap:wrap}
+.consulta-result{margin-top:14px}
+.consulta-empty{padding:14px;border:1px dashed #cbd5e1;border-radius:12px;background:#f8fafc}
+
 </style>
 </head>
 <body>
-<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.8 — Múltiplas Bases Patrimoniais</div></header>
+<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.9 — Consulta + Mapeamento</div></header>
 <main>
+
+<section id="homeView" class="module-view active">
+  <div class="card">
+    <h2 style="margin-top:0">Sistema Patrimonial CGPL</h2>
+    <p class="muted">Escolha o módulo que deseja utilizar.</p>
+    <div class="home-grid">
+      <div class="home-card" id="abrirConsulta">
+        <span class="home-icon">🔎</span>
+        <h3>Consulta de Bens</h3>
+        <p class="muted">Pesquisa rápida e somente leitura por patrimônio, patrimônio anterior, série ou IMEI.</p>
+      </div>
+      <div class="home-card" id="abrirMapeamento">
+        <span class="home-icon">📋</span>
+        <h3>Mapeamento de Bens</h3>
+        <p class="muted">Coleta, localização, SRP, bens fora da base, resumo, histórico e exportação.</p>
+      </div>
+    </div>
+    <div id="homeBaseStatus" class="status info" style="margin-top:16px">Nenhuma base carregada.</div>
+  </div>
+</section>
+
+<section id="consultaView" class="module-view">
+  <div class="module-bar">
+    <h2 class="module-title">🔎 Consulta de Bens</h2>
+    <button class="secondary" id="voltarConsulta">← Menu</button>
+  </div>
+  <div class="card">
+    <p class="muted">Esta área é somente para consulta. Nenhuma pesquisa é registrada no mapeamento ou no histórico.</p>
+    <label>Patrimônio, Patrimônio Anterior, Série ou IMEI</label>
+    <div class="consulta-actions">
+      <input id="consultaEntrada" placeholder="Digite ou leia a etiqueta" style="flex:1;min-width:220px">
+      <button id="btnConsultarBem">Consultar</button>
+      <button class="secondary" id="btnConsultaCamera">📷 Ler etiqueta</button>
+    </div>
+    <div id="consultaStatus" class="status info" style="margin-top:10px">Aguardando consulta.</div>
+    <div id="consultaResultado" class="consulta-result"></div>
+  </div>
+  <div id="consultaCameraBox" class="card" style="display:none">
+    <div class="module-bar">
+      <h3 class="module-title">Leitura pela câmera</h3>
+      <button class="secondary" id="btnFecharConsultaCamera">Fechar câmera</button>
+    </div>
+    <div id="consultaReader" style="width:100%"></div>
+  </div>
+</section>
+
+<section id="mapeamentoView" class="module-view">
+  <div class="module-bar">
+    <h2 class="module-title">📋 Mapeamento de Bens</h2>
+    <button class="secondary" id="voltarMapeamento">← Menu</button>
+  </div>
 <section class="card">
 <h2>1. Base patrimonial</h2>
 <p class="muted">Você pode carregar várias bases GPAT ou CSV. Todas serão consolidadas para consulta durante o mapeamento.</p>
@@ -146,6 +211,8 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 </section>
 </main>
 
+
+</section>
 <script>
 const $=id=>document.getElementById(id);
 let base=[],basesCarregadas=[],indexPat=new Map(),indexPatAnterior=new Map(),indexSerie=new Map(),indexImei=new Map(),coletas=[],sessao={},scanner=null,ultimoScan="",ultimoScanEm=0,lanternaLigada=false,pendenteForaBase="",tipoPendenteManual="";
@@ -448,6 +515,147 @@ $("andar").addEventListener("change",()=>{
 });
 atualizarLocaisUorg();
 
+
+let consultaScanner=null,consultaUltimo="",consultaUltimoEm=0;
+
+function showModule(id){
+  document.querySelectorAll(".module-view").forEach(x=>x.classList.remove("active"));
+  $(id).classList.add("active");
+  if(id==="homeView") atualizarHomeBaseStatus();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function atualizarHomeBaseStatus(){
+  const qtd=basesCarregadas.length;
+  $("homeBaseStatus").className=qtd?"status ok":"status info";
+  $("homeBaseStatus").textContent=qtd
+    ?`${qtd} base${qtd>1?"s":""} carregada${qtd>1?"s":""} — ${base.length} bens disponíveis para consulta e mapeamento.`
+    :"Nenhuma base carregada. Entre em Mapeamento de Bens para adicionar uma base patrimonial.";
+}
+function renderConsultaBem(b,termo){
+  if(!b){
+    $("consultaStatus").className="status warning";
+    $("consultaStatus").textContent=`Não localizado na base: ${termo}`;
+    $("consultaResultado").innerHTML='<div class="consulta-empty">Nenhum bem correspondente foi encontrado nas bases patrimoniais carregadas.</div>';
+    return;
+  }
+  const dados={
+    patrimonio:getAny(b,["Patrimônio","Patrimonio","Nº Patrimônio"]),
+    material:getAny(b,["Material"]),
+    marca:getAny(b,["Marca"]),
+    modelo:getAny(b,["Modelo"]),
+    serie:getAny(b,["Série","Serie","Nº Série"]),
+    fabricante:getAny(b,["Fabricante"]),
+    uorg:getAny(b,["UORG"]),
+    destinacao:getAny(b,["Destinação","Destinacao"]),
+    anterior:getAny(b,["Patrimônio Anterior","Patrimonio Anterior"]),
+    tombamento:getAny(b,["Tombamento"]),
+    conta:getAny(b,["Conta Contábil","Conta Contabil"]),
+    detentor:getAny(b,["Detentor"])
+  };
+  $("consultaStatus").className="status ok";
+  $("consultaStatus").textContent="Bem localizado na base patrimonial.";
+  $("consultaResultado").innerHTML=`
+    <div class="card" style="background:#f8fafc">
+      <h3 style="margin-top:0">Patrimônio ${dados.patrimonio||"-"}</h3>
+      <div><b>Material:</b> ${dados.material||"-"}</div>
+      <div><b>Marca:</b> ${dados.marca||"-"}</div>
+      <div><b>Modelo:</b> ${dados.modelo||"-"}</div>
+      <div><b>Série:</b> ${dados.serie||"-"}</div>
+      <div><b>Fabricante:</b> ${dados.fabricante||"-"}</div>
+      <div><b>UORG:</b> ${dados.uorg||"-"}</div>
+      <div><b>Destinação:</b> ${dados.destinacao||"-"}</div>
+      <div><b>Patrimônio Anterior:</b> ${dados.anterior||"-"}</div>
+      <div><b>Tombamento:</b> ${dados.tombamento||"-"}</div>
+      <div><b>Conta Contábil:</b> ${dados.conta||"-"}</div>
+      <div><b>Detentor:</b> ${dados.detentor||"-"}</div>
+      <div class="actions" style="margin-top:12px">
+        <button class="secondary" id="btnCopiarConsulta">Copiar dados</button>
+        <button class="secondary" id="btnNovaConsulta">Nova consulta</button>
+      </div>
+    </div>`;
+  const texto=`Patrimônio: ${dados.patrimonio||"-"}
+Material: ${dados.material||"-"}
+Marca: ${dados.marca||"-"}
+Modelo: ${dados.modelo||"-"}
+Série: ${dados.serie||"-"}
+Fabricante: ${dados.fabricante||"-"}
+UORG: ${dados.uorg||"-"}
+Destinação: ${dados.destinacao||"-"}
+Patrimônio Anterior: ${dados.anterior||"-"}
+Tombamento: ${dados.tombamento||"-"}
+Conta Contábil: ${dados.conta||"-"}
+Detentor: ${dados.detentor||"-"}`;
+  $("btnCopiarConsulta").onclick=async()=>{
+    try{
+      await navigator.clipboard.writeText(texto);
+      $("consultaStatus").className="status ok";
+      $("consultaStatus").textContent="Informações copiadas.";
+    }catch(e){ alert(texto); }
+  };
+  $("btnNovaConsulta").onclick=()=>{
+    $("consultaEntrada").value="";
+    $("consultaResultado").innerHTML="";
+    $("consultaStatus").className="status info";
+    $("consultaStatus").textContent="Aguardando consulta.";
+    $("consultaEntrada").focus();
+  };
+}
+function consultarBem(){
+  const termo=norm($("consultaEntrada").value);
+  if(!termo)return;
+  if(!base.length){
+    $("consultaStatus").className="status warning";
+    $("consultaStatus").textContent="Nenhuma base patrimonial carregada.";
+    $("consultaResultado").innerHTML="";
+    return;
+  }
+  renderConsultaBem(findBem(termo),termo);
+}
+async function iniciarConsultaCamera(){
+  if(!base.length){
+    $("consultaStatus").className="status warning";
+    $("consultaStatus").textContent="Carregue uma base patrimonial antes de usar a consulta.";
+    return;
+  }
+  $("consultaCameraBox").style.display="block";
+  if(consultaScanner)return;
+  consultaScanner=new Html5Qrcode("consultaReader");
+  const config={fps:20,qrbox:{width:320,height:110}};
+  try{
+    await consultaScanner.start({facingMode:"environment"},config,async decodedText=>{
+      const agora=Date.now(),code=norm(decodedText);
+      if(!code)return;
+      if(code===consultaUltimo && agora-consultaUltimoEm<1800)return;
+      consultaUltimo=code;consultaUltimoEm=agora;
+      $("consultaEntrada").value=code;
+      consultarBem();
+      await fecharConsultaCamera();
+    });
+  }catch(e){
+    $("consultaStatus").className="status warning";
+    $("consultaStatus").textContent="Não foi possível iniciar a câmera.";
+    $("consultaCameraBox").style.display="none";
+    consultaScanner=null;
+  }
+}
+async function fecharConsultaCamera(){
+  if(consultaScanner){
+    try{await consultaScanner.stop();}catch(e){}
+    try{await consultaScanner.clear();}catch(e){}
+    consultaScanner=null;
+  }
+  $("consultaCameraBox").style.display="none";
+}
+$("abrirConsulta").onclick=()=>showModule("consultaView");
+$("abrirMapeamento").onclick=()=>showModule("mapeamentoView");
+$("voltarConsulta").onclick=async()=>{await fecharConsultaCamera();showModule("homeView")};
+$("voltarMapeamento").onclick=()=>showModule("homeView");
+$("btnConsultarBem").onclick=consultarBem;
+$("consultaEntrada").addEventListener("keydown",e=>{if(e.key==="Enter")consultarBem()});
+$("btnConsultaCamera").onclick=iniciarConsultaCamera;
+$("btnFecharConsultaCamera").onclick=fecharConsultaCamera;
+
 load();
+atualizarHomeBaseStatus();
 </script>
 </body></html>
