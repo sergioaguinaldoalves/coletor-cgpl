@@ -43,7 +43,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 </style>
 </head>
 <body>
-<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.9 — Consulta + Mapeamento</div></header>
+<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.10 — Consulta + Mapeamento</div></header>
 <main>
 
 <section id="homeView" class="module-view active">
@@ -78,6 +78,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
       <input id="consultaEntrada" placeholder="Digite ou leia a etiqueta" style="flex:1;min-width:220px">
       <button id="btnConsultarBem">Consultar</button>
       <button class="secondary" id="btnConsultaCamera">📷 Ler etiqueta</button>
+      <button class="secondary" id="btnLimparConsulta">Limpar consulta</button>
     </div>
     <div id="consultaStatus" class="status info" style="margin-top:10px">Aguardando consulta.</div>
     <div id="consultaResultado" class="consulta-result"></div>
@@ -94,7 +95,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 <section id="mapeamentoView" class="module-view">
   <div class="module-bar">
     <h2 class="module-title">📋 Mapeamento de Bens</h2>
-    <button class="secondary" id="voltarMapeamento">← Menu</button>
+    <div class="actions"><button class="danger" id="btnLimparMapeamento">Limpar mapeamento</button><button class="secondary" id="voltarMapeamento">← Menu</button></div>
   </div>
 <section class="card">
 <h2>1. Base patrimonial</h2>
@@ -516,6 +517,13 @@ $("andar").addEventListener("change",()=>{
 atualizarLocaisUorg();
 
 
+function limparMapeamento(){
+  if(!coletas.length){alert("Não há registros de mapeamento para limpar.");return;}
+  if(!confirm("Limpar todo o mapeamento realizado neste dispositivo? As bases patrimoniais serão mantidas."))return;
+  coletas=[];localStorage.removeItem("cgpl_coletas");render();
+  $("ultimoCodigo").textContent="-";$("resultadoLeitura").className="status info";$("resultadoLeitura").textContent="Mapeamento limpo. Aguardando nova coleta.";$("detalhesBem").innerHTML="";
+  if(document.getElementById("foraBaseBox")) $("foraBaseBox").style.display="none";pendenteForaBase="";tipoPendenteManual="";
+}
 let consultaScanner=null,consultaUltimo="",consultaUltimoEm=0;
 
 function showModule(id){
@@ -600,6 +608,13 @@ Detentor: ${dados.detentor||"-"}`;
     $("consultaEntrada").focus();
   };
 }
+function limparConsulta(){
+  $("consultaEntrada").value="";
+  $("consultaResultado").innerHTML="";
+  $("consultaStatus").className="status info";
+  $("consultaStatus").textContent="Aguardando consulta.";
+  $("consultaEntrada").focus();
+}
 function consultarBem(){
   const termo=norm($("consultaEntrada").value);
   if(!termo)return;
@@ -627,6 +642,7 @@ async function iniciarConsultaCamera(){
       if(!code)return;
       if(code===consultaUltimo && agora-consultaUltimoEm<1800)return;
       consultaUltimo=code;consultaUltimoEm=agora;
+      limparConsulta();
       $("consultaEntrada").value=code;
       consultarBem();
       await fecharConsultaCamera();
@@ -650,7 +666,9 @@ $("abrirConsulta").onclick=()=>showModule("consultaView");
 $("abrirMapeamento").onclick=()=>showModule("mapeamentoView");
 $("voltarConsulta").onclick=async()=>{await fecharConsultaCamera();showModule("homeView")};
 $("voltarMapeamento").onclick=()=>showModule("homeView");
+$("btnLimparMapeamento").onclick=limparMapeamento;
 $("btnConsultarBem").onclick=consultarBem;
+$("btnLimparConsulta").onclick=limparConsulta;
 $("consultaEntrada").addEventListener("keydown",e=>{if(e.key==="Enter")consultarBem()});
 $("btnConsultaCamera").onclick=iniciarConsultaCamera;
 $("btnFecharConsultaCamera").onclick=fecharConsultaCamera;
