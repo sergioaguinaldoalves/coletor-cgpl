@@ -1,11 +1,11 @@
-COLETOR PATRIMONIAL CGPL — V2.9
+COLETOR PATRIMONIAL CGPL — V2.11
 
-NOVIDADE: SUBSISTEMA DE CONSULTA
-- Tela inicial com dois módulos separados: Consulta de Bens e Mapeamento de Bens.
-- Consulta é somente leitura e não registra coleta nem histórico.
-- Pesquisa por Patrimônio, Patrimônio Anterior, Série ou IMEI.
-- Exibe os 12 campos principais da base GPAT.
-- Leitura pela câmera disponível apenas para consulta.
-- Botões "Copiar dados" e "Nova consulta".
-- As bases patrimoniais são compartilhadas entre Consulta e Mapeamento.
-- Mantidas as funcionalidades da V2.8.
+AJUSTES
+- Item 2 - Mapeamento de Bens: ação "Limpar mapeamento" posicionada junto ao início/atualização do mapeamento.
+- Item 5 - Histórico: "Limpar coletas" executa a mesma rotina de "Limpar mapeamento".
+- Cada registro do Histórico possui agora as ações "Editar" e "Excluir".
+- A edição permite ajustar Material, Marca, Modelo, Série, UAP, UORG do mapeamento, Unidade, Andar/Localização, Sala, Responsável/Detentor e Agente da coleta.
+- Patrimônio/Código fica somente leitura para preservar a identidade do registro.
+- Para Fora da Base e SRP, Material continua obrigatório.
+- Editar um registro altera somente o mapeamento/histórico local e não modifica a base GPAT importada.
+- Excluir remove apenas o item selecionado, sem necessidade de reiniciar o mapeamento.
