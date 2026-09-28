@@ -43,7 +43,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 </style>
 </head>
 <body>
-<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.10 — Consulta + Mapeamento</div></header>
+<header><b>CGPL / SECOM</b> — Coletor Patrimonial<div style="font-size:12px;opacity:.9">PWA V2.11 — Edição do Mapeamento</div></header>
 <main>
 
 <section id="homeView" class="module-view active">
@@ -95,7 +95,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 <section id="mapeamentoView" class="module-view">
   <div class="module-bar">
     <h2 class="module-title">📋 Mapeamento de Bens</h2>
-    <div class="actions"><button class="danger" id="btnLimparMapeamento">Limpar mapeamento</button><button class="secondary" id="voltarMapeamento">← Menu</button></div>
+    <div class="actions"><button class="secondary" id="voltarMapeamento">← Menu</button></div>
   </div>
 <section class="card">
 <h2>1. Base patrimonial</h2>
@@ -153,7 +153,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 </select></div>
 </div>
 <label style="margin-top:10px">Observação</label><textarea id="obsSessao"></textarea>
-<div class="actions" style="margin-top:10px"><button class="good" id="btnIniciarSessao">Iniciar / Atualizar mapeamento</button></div>
+<div class="actions" style="margin-top:10px"><button class="good" id="btnIniciarSessao">Iniciar / Atualizar mapeamento</button><button class="danger" id="btnLimparMapeamento">Limpar mapeamento</button></div>
 <div id="sessaoStatus" class="status info">Mapeamento ainda não iniciado.</div>
 </section>
 
@@ -208,7 +208,18 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;borde
 <section class="card">
 <h2>5. Histórico</h2>
 <div class="actions"><button id="btnExportar">Exportar coleta CSV</button><button class="danger" id="btnLimpar">Limpar coletas</button></div>
-<div class="tablewrap" style="margin-top:10px"><table><thead><tr><th>Data/Hora</th><th>Patrimônio</th><th>Material</th><th>UORG</th><th>Detentor</th><th>Sala</th><th>Resultado</th></tr></thead><tbody id="tbody"></tbody></table></div>
+<div class="tablewrap" style="margin-top:10px"><table><thead><tr><th>Data/Hora</th><th>Patrimônio</th><th>Material</th><th>UORG</th><th>Detentor</th><th>Sala</th><th>Resultado</th><th>Ações</th></tr></thead><tbody id="tbody"></tbody></table></div>
+<div id="editorHistorico" class="card" style="display:none;margin-top:14px;background:#f8fafc">
+<h3 style="margin-top:0">Editar item do mapeamento</h3><input type="hidden" id="editIndex">
+<div class="grid">
+<div><label>Patrimônio / Código</label><input id="editPatrimonio" readonly></div>
+<div><label>Material</label><input id="editMaterial"></div><div><label>Marca</label><input id="editMarca"></div><div><label>Modelo</label><input id="editModelo"></div><div><label>Série</label><input id="editSerie"></div>
+<div><label>UAP</label><select id="editUap"><option value="">Selecione...</option><option value="GM/SECOM">GM/SECOM</option><option value="CONJUR/SECOM">CONJUR/SECOM</option><option value="AESP/SECOM">AESP/SECOM</option><option value="APADI/SECOM">APADI/SECOM</option><option value="SE/SECOM">SE/SECOM</option><option value="SUBNOR/SE">SUBNOR/SE</option><option value="SIMP">SIMP</option><option value="SPP">SPP</option><option value="SECOI">SECOI</option><option value="SEAUD">SEAUD</option><option value="SPDIGI">SPDIGI</option><option value="SERES">SERES</option></select></div>
+<div><label>UORG do mapeamento</label><select id="editUorg"><option value="">Selecione...</option><option value="23034 - Palácio do Planalto">23034 — Palácio do Planalto</option><option value="138528 - Anexo Bloco R">138528 — Anexo Bloco R</option><option value="138523 - Anexo Palácio do Planalto">138523 — Anexo Palácio do Planalto</option><option value="148230 - Bens de uso individual">148230 — Bens de uso individual</option></select></div>
+<div><label>Unidade</label><input id="editUnidade"></div><div><label>Andar / Localização</label><input id="editAndar"></div><div><label>Sala</label><input id="editSala"></div><div><label>Responsável / Detentor</label><input id="editResponsavel"></div>
+<div><label>Agente da coleta</label><select id="editAgente"><option value="">Selecione...</option><option>Joseildes</option><option>Franciélio</option><option>Sérgio</option><option>João</option><option>Adrielle</option><option>Jéssica</option><option>Tavares</option><option>Júnia</option></select></div>
+</div><div class="actions" style="margin-top:10px"><button class="good" id="btnSalvarEdicao">Salvar alterações</button><button class="secondary" id="btnCancelarEdicao">Cancelar</button></div>
+<div class="status info" style="margin-top:8px">A edição altera somente o registro do mapeamento/histórico; não modifica a base patrimonial importada.</div></div>
 </section>
 </main>
 
@@ -299,7 +310,7 @@ function removerBase(i){
   if(!confirm(`Excluir a base "${basesCarregadas[i]?.nome||""}"?`))return;
   basesCarregadas.splice(i,1);rebuild();render();
 }
-function render(){const scope=coletas.filter(x=>!sessao.sala||x.sala===sessao.sala);$("kTotal").textContent=scope.length;$("kConforme").textContent=scope.filter(x=>x.resultado==="CONFORME").length;$("kFora").textContent=scope.filter(x=>x.resultado==="NÃO CONSTA NA BASE").length;$("kSemPat").textContent=scope.filter(x=>x.resultado==="SEM REGISTRO DE PATRIMÔNIO").length;$("tbody").innerHTML=coletas.slice().reverse().map(x=>`<tr><td>${x.dataHora}</td><td>${x.patrimonio||x.codigo}</td><td>${x.material||x.descricao||"-"}</td><td>${x.uorgGPAT||"-"}</td><td>${x.detentor||"-"}</td><td>${x.sala||"-"}</td><td>${x.resultado}</td></tr>`).join("")}
+function render(){const scope=coletas.filter(x=>!sessao.sala||x.sala===sessao.sala);$("kTotal").textContent=scope.length;$("kConforme").textContent=scope.filter(x=>x.resultado==="CONFORME").length;$("kFora").textContent=scope.filter(x=>x.resultado==="NÃO CONSTA NA BASE").length;$("kSemPat").textContent=scope.filter(x=>x.resultado==="SEM REGISTRO DE PATRIMÔNIO").length;$("tbody").innerHTML=coletas.map((x,i)=>({x,i})).reverse().map(({x,i})=>`<tr><td>${x.dataHora}</td><td>${x.patrimonio||x.codigo}</td><td>${x.material||x.descricao||"-"}</td><td>${x.uorg||x.uorgGPAT||"-"}</td><td>${x.responsavel||x.detentor||"-"}</td><td>${x.sala||"-"}</td><td>${x.resultado}</td><td><div class="actions"><button class="secondary" style="padding:6px 9px" onclick="editarColeta(${i})">Editar</button><button class="danger" style="padding:6px 9px" onclick="excluirColeta(${i})">Excluir</button></div></td></tr>`).join("")}
 function load(){
   try{
     basesCarregadas=JSON.parse(localStorage.getItem("cgpl_bases")||"[]");
@@ -487,9 +498,14 @@ $("btnCamera").onclick=async()=>{
 $("btnPararCamera").onclick=async()=>{if(scanner){try{await scanner.stop();await scanner.clear()}catch(e){}scanner=null;lanternaLigada=false;$("cameraHint").className="status info";$("cameraHint").textContent="Câmera parada."}};
 $("btnLanterna").onclick=async()=>{if(!scanner)return alert("Inicie a câmera primeiro.");try{const caps=scanner.getRunningTrackCapabilities?.();if(!caps?.torch)return alert("Lanterna não disponível neste aparelho/navegador.");lanternaLigada=!lanternaLigada;await scanner.applyVideoConstraints({advanced:[{torch:lanternaLigada}]});$("btnLanterna").textContent=lanternaLigada?"Apagar lanterna":"Lanterna"}catch(e){alert("Não foi possível controlar a lanterna.")}};
 
+function editarColeta(i){const x=coletas[i];if(!x)return;$("editIndex").value=i;$("editPatrimonio").value=x.patrimonio||x.codigo||"";$("editMaterial").value=x.material||x.descricao||"";$("editMarca").value=x.marca||"";$("editModelo").value=x.modelo||"";$("editSerie").value=x.serie||"";$("editUap").value=x.secretaria||"";$("editUorg").value=x.uorg||"";$("editUnidade").value=x.unidade||"";$("editAndar").value=x.andar||"";$("editSala").value=x.sala||"";$("editResponsavel").value=x.responsavel||"";$("editAgente").value=x.agente||"";$("editorHistorico").style.display="block";$("editorHistorico").scrollIntoView({behavior:"smooth",block:"start"})}
+function excluirColeta(i){const x=coletas[i];if(!x)return;const id=x.patrimonio||x.codigo||"item";if(!confirm(`Excluir do mapeamento o registro ${id}?`))return;coletas.splice(i,1);localStorage.setItem("cgpl_coletas",JSON.stringify(coletas));$("editorHistorico").style.display="none";render()}
+$("btnSalvarEdicao").onclick=()=>{const i=Number($("editIndex").value),x=coletas[i];if(!x)return;const material=norm($("editMaterial").value);if((x.resultado==="NÃO CONSTA NA BASE"||x.resultado==="SEM REGISTRO DE PATRIMÔNIO")&&!material){alert("Para bem fora da base ou SRP, o Material permanece obrigatório.");$("editMaterial").focus();return}x.material=material;x.descricao=material;x.marca=norm($("editMarca").value);x.modelo=norm($("editModelo").value);x.serie=norm($("editSerie").value);x.secretaria=norm($("editUap").value);x.uorg=norm($("editUorg").value);x.unidade=norm($("editUnidade").value);x.andar=norm($("editAndar").value);x.sala=norm($("editSala").value);x.responsavel=norm($("editResponsavel").value);x.agente=norm($("editAgente").value);x.editadoEm=new Date().toLocaleString("pt-BR");localStorage.setItem("cgpl_coletas",JSON.stringify(coletas));$("editorHistorico").style.display="none";render()};
+$("btnCancelarEdicao").onclick=()=>{$("editorHistorico").style.display="none"};
+
 function csvCell(v){return `"${String(v??"").replaceAll('"','""')}"`}
 $("btnExportar").onclick=()=>{if(!coletas.length)return alert("Nenhuma coleta.");const cab=["Data/Hora","Código de Coleta","Patrimônio","Material","Marca","Modelo","Série","Fabricante","UORG","Destinação","Patrimônio Anterior","Tombamento","Conta Contábil","Detentor","Unidade Administrativa Patrimonial - UAP","UORG Encontrada","Unidade Encontrada","Andar/Localização Encontrada","Sala Encontrada","Responsável/Detentor Encontrado","Agente da Coleta","Resultado"];const lines=[cab.map(csvCell).join(";"),...coletas.map(x=>[x.dataHora,x.codigo,x.patrimonio,x.material||x.descricao,x.marca,x.modelo,x.serie,x.fabricante,x.uorgGPAT,x.destinacao,x.patrimonioAnterior,x.tombamento,x.contaContabil,x.detentor,x.secretaria,x.uorg,x.unidade,x.andar,x.sala,x.responsavel,x.agente,x.resultado].map(csvCell).join(";"))];const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CGPL_coleta_patrimonial_GPAT_completa.csv";a.click();URL.revokeObjectURL(a.href)};
-$("btnLimpar").onclick=()=>{if(confirm("Excluir todas as coletas deste dispositivo?")){coletas=[];localStorage.removeItem("cgpl_coletas");render()}};
+$("btnLimpar").onclick=limparMapeamento;
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 
 const locaisPorUorg={
